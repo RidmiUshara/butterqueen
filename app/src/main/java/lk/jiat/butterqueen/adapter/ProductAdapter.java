@@ -64,7 +64,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         }
         holder.productDescriptionTextView.setText(description);
         holder.productPriceTextView.setText(
-                UnitPricing.priceLabel(product.getPrice(), UnitPricing.normalize(product.getUnitType(), product.getCategoryName()))
+                !UnitPricing.isSupported(product.getUnitType())
+                        ? "Price under review"
+                        : !product.isAvailable() ? "Currently unavailable"
+                        : UnitPricing.priceLabel(product.getPrice(),
+                                UnitPricing.normalize(product.getUnitType(),
+                                        product.getCategoryName()))
         );
 
         if (product.getImageUrl() != null && !product.getImageUrl().trim().isEmpty()) {

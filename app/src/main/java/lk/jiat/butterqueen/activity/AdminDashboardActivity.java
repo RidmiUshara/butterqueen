@@ -19,13 +19,14 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -105,14 +106,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadProducts() {
-        firestore.collection("products").orderBy("createdAtMillis", Query.Direction.DESCENDING)
-                .limit(200).get()
+        firestore.collection("products").get()
                 .addOnSuccessListener(snapshot -> {
                     if (showingOrders || isFinishing()) return;
+                    List<DocumentSnapshot> documents = new ArrayList<>(snapshot.getDocuments());
+                    documents.sort((left, right) -> Long.compare(
+                            createdAt(right), createdAt(left)));
                     statusText.setText(snapshot.isEmpty()
                             ? "No products yet. Set up categories, then add a product."
                             : snapshot.size() + " products • tap one to edit");
-                    for (DocumentSnapshot doc : snapshot) {
+                    for (DocumentSnapshot doc : documents) {
                         Product product = doc.toObject(Product.class);
                         if (product == null) continue;
                         product.setId(doc.getId());
@@ -143,13 +146,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadOrders() {
-        firestore.collection("orders").orderBy("createdAtMillis", Query.Direction.DESCENDING)
-                .limit(100).get()
+        firestore.collection("orders").get()
                 .addOnSuccessListener(snapshot -> {
                     if (!showingOrders || isFinishing()) return;
+                    List<DocumentSnapshot> documents = new ArrayList<>(snapshot.getDocuments());
+                    documents.sort((left, right) -> Long.compare(
+                            createdAt(right), createdAt(left)));
                     statusText.setText(snapshot.isEmpty()
                             ? "No orders yet." : "Latest " + snapshot.size() + " orders");
-                    for (DocumentSnapshot doc : snapshot) {
+                    for (DocumentSnapshot doc : documents) {
                         String payment = doc.getString("paymentStatus");
                         String date = new SimpleDateFormat("dd MMM yyyy, HH:mm",
                                 Locale.getDefault()).format(new Date(
@@ -357,6 +362,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         bottom.setPadding(0, dp(8), 0, 0);
         content.addView(bottom);
         return card;
+    }
+
+    private long createdAt(DocumentSnapshot doc) {
+        Long timestamp = doc.getLong("createdAtMillis");
+        return timestamp == null ? 0 : timestamp;
     }
 
     private int dp(int value) {

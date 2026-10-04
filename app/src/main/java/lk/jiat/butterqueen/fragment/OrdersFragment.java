@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +73,6 @@ public class OrdersFragment extends Fragment {
 
         listenerRegistration = firestore.collection("orders")
                 .whereEqualTo("userId", userId)
-                .orderBy("createdAtMillis", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (!isAdded() || binding == null) {
                         return;
@@ -94,6 +92,8 @@ public class OrdersFragment extends Fragment {
                         }
                     }
 
+                    orderList.sort((left, right) -> Long.compare(
+                            right.getCreatedAtMillis(), left.getCreatedAtMillis()));
                     adapter.notifyDataSetChanged();
 
                     boolean isEmpty = orderList.isEmpty();
