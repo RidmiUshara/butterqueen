@@ -200,9 +200,8 @@ public class AdminProductActivity extends AppCompatActivity {
             priceInput.setError("Enter a price above zero with at most 2 decimals");
             return;
         }
-        if (!imageUrl.isEmpty() && !(imageUrl.startsWith("https://")
-                || imageUrl.startsWith("http://"))) {
-            imageUrlInput.setError("Use an http(s) image URL");
+        if (!imageUrl.isEmpty() && !imageUrl.startsWith("https://")) {
+            imageUrlInput.setError("Use an HTTPS image URL");
             return;
         }
         int selected = categorySpinner.getSelectedItemPosition();

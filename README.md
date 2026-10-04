@@ -21,7 +21,7 @@ ButterQueen is a Java Android cake ordering app. The current code includes Fireb
 
 - The client uses the PayHere **sandbox URL only**. A successful SDK activity result records `verification_pending`, never `paid`.
 - There is no trusted payment notification endpoint in this repository. Do not switch to live payments until a server verifies PayHere's notification signature and updates the order.
-- The app currently calculates item totals and delivery fees on the device. A trusted server must recalculate amounts from product data before charging or fulfilling a real order. Client-submitted totals are not authoritative.
+- Checkout rechecks current product availability, unit, and price from Firestore before starting an order. This catches stale carts; it is still a client check. A trusted server must recalculate item and delivery totals before charging or fulfilling a real order. Client-submitted totals are not authoritative.
 - Review and deploy Firebase Firestore and Storage rules in the actual Firebase project. Candidate rules and their assumptions are in `security/`; they are **not deployed** by this repository.
 - Account deletion in the current Android client does not reliably purge nested Firestore data, orders, and profile images. A trusted backend deletion workflow is required before calling that a complete deletion.
 

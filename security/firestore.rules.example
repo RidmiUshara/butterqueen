@@ -90,6 +90,10 @@ service cloud.firestore {
         );
       // A client admin may manage order status, but cannot declare a payment paid.
       allow update: if isAdmin()
+        && request.resource.data.orderStatus in [
+          'placed', 'preparing', 'out_for_delivery', 'delivered',
+          'cancelled', 'payment_pending'
+        ]
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['orderStatus'])
         && (resource.data.paymentMethod != 'payhere'

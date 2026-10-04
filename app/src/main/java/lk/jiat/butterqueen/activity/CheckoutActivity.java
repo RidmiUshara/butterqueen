@@ -30,6 +30,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ import java.util.concurrent.Executors;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.data.CartManager;
 import lk.jiat.butterqueen.model.CartItem;
+import lk.jiat.butterqueen.model.Product;
 import lk.jiat.butterqueen.model.UnitPricing;
 import lk.jiat.butterqueen.payment.PayHereConfig;
 import lk.payhere.androidsdk.PHConfigs;
@@ -84,6 +86,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private double currentDeliveryFee = 0.0;
     private boolean deliveryAvailable = false;
     private boolean deliveryCalculated = false;
+    private boolean checkingCatalog = false;
 
     private String latestAddressQuery = "";
 
@@ -367,6 +370,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void placeOrder() {
+        if (checkingCatalog) return;
         if (firebaseAuth.getCurrentUser() == null) {
             Toast.makeText(this, "Please sign in again", Toast.LENGTH_SHORT).show();
             return;
@@ -427,11 +431,58 @@ public class CheckoutActivity extends AppCompatActivity {
 
         int checkedId = paymentMethodRadioGroup.getCheckedRadioButtonId();
 
-        if (checkedId == R.id.cardRadioButton) {
-            startPayHerePayment(currentCart, fullName, phone, address, note);
-        } else {
-            saveOrderToFirestore(currentCart, fullName, phone, address, note, "cash_on_delivery", "", "pending");
+        checkingCatalog = true;
+        placeOrderButton.setEnabled(false);
+        verifyCartAgainstCatalog(currentCart, 0, () -> {
+            checkingCatalog = false;
+            placeOrderButton.setEnabled(true);
+            if (checkedId == R.id.cardRadioButton) {
+                startPayHerePayment(currentCart, fullName, phone, address, note);
+            } else {
+                saveOrderToFirestore(currentCart, fullName, phone, address, note,
+                        "cash_on_delivery", "", "pending");
+            }
+        });
+    }
+
+    private void verifyCartAgainstCatalog(List<CartItem> cart, int index, Runnable onValid) {
+        if (index >= cart.size()) {
+            onValid.run();
+            return;
         }
+        CartItem item = cart.get(index);
+        if (item.getProductId() == null || item.getProductId().isEmpty()) {
+            catalogChanged();
+            return;
+        }
+        firestore.collection("products").document(item.getProductId()).get(Source.SERVER)
+                .addOnSuccessListener(doc -> {
+                    Product product = doc.toObject(Product.class);
+                    if (!doc.exists() || product == null
+                            || Boolean.FALSE.equals(doc.getBoolean("available"))
+                            || !UnitPricing.isSupported(product.getUnitType())
+                            || !UnitPricing.normalize(product.getUnitType(),
+                                    product.getCategoryName()).equals(
+                                            UnitPricing.normalize(item.getUnitType(), null))
+                            || Math.abs(product.getPrice() - item.getProductPrice()) > 0.005) {
+                        catalogChanged();
+                        return;
+                    }
+                    verifyCartAgainstCatalog(cart, index + 1, onValid);
+                })
+                .addOnFailureListener(error -> {
+                    checkingCatalog = false;
+                    placeOrderButton.setEnabled(true);
+                    Toast.makeText(this, "Could not verify current product prices. Retry online.",
+                            Toast.LENGTH_LONG).show();
+                });
+    }
+
+    private void catalogChanged() {
+        checkingCatalog = false;
+        placeOrderButton.setEnabled(true);
+        Toast.makeText(this, "A product or price changed. Remove it and add it again.",
+                Toast.LENGTH_LONG).show();
     }
 
     private void startPayHerePayment(List<CartItem> currentCart,
