@@ -1,0 +1,30 @@
+# Android Studio and Gradle output
+.gradle/
+**/build/
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.hprof
+*.log
+.DS_Store
+Thumbs.db
+
+# Local configuration and credentials
+local.properties
+secrets.properties
+keystore.properties
+.env
+.env.*
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+**/google-services.json
+*service-account*.json
+*serviceAccount*.json
+*firebase-adminsdk*.json

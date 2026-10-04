@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function ownsOrder(orderId) {
+      return signedIn() &&
+        get(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid;
+    }
+    function ownsOrderAfterBatch(orderId) {
+      return signedIn() &&
+        getAfter(/databases/$(database)/documents/orders/$(orderId)).data.userId == request.auth.uid;
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false; // Server/Admin SDK only.
+    }
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if false; // Server/Admin SDK only.
+    }
+
+    match /users/{uid} {
+      allow get, create, update, delete: if isOwner(uid);
+      allow list: if false;
+
+      match /cart/{cartId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    match /orders/{orderId} {
+      allow get, list: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.orderId == orderId
+        && request.resource.data.paymentMethod in ['cash_on_delivery', 'payhere']
+        && (
+          (request.resource.data.paymentMethod == 'cash_on_delivery'
+            && request.resource.data.paymentStatus == 'pending'
+            && request.resource.data.orderStatus == 'placed')
+          ||
+          (request.resource.data.paymentMethod == 'payhere'
+            && request.resource.data.paymentStatus == 'verification_pending'
+            && request.resource.data.orderStatus == 'payment_pending')
+        );
+      // Only a trusted backend may change payment/order status.
+      allow update, delete: if false;
+
+      match /items/{itemId} {
+        allow get, list: if ownsOrder(orderId);
+        allow create: if ownsOrderAfterBatch(orderId)
+          && request.resource.data.orderItemId == itemId;
+        allow update, delete: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

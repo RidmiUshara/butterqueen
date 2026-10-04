@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/bottom_home"
+            android:icon="@drawable/home_24px"
+            android:title="@string/side_nav_home_title" />
+
+        <item
+            android:id="@+id/bottom_cart"
+            android:icon="@drawable/shopping_cart_24px"
+            android:title="@string/side_nav_cart_title" />
+
+        <item
+            android:id="@+id/bottom_wishlist"
+            android:icon="@drawable/favorite_24px"
+            android:title="@string/side_nav_wishlist_title" />
+
+        <item
+            android:id="@+id/bottom_profile"
+            android:icon="@drawable/account_circle_24px"
+            android:title="@string/side_nav_profile_title" />
+    </group>
+
+</menu>

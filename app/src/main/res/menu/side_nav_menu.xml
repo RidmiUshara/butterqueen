@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+
+            android:id="@+id/nav_home"
+
+            android:icon="@drawable/home_24px"
+            android:title="@string/side_nav_home_title"/>
+<!--            android:checked="true"-->
+
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/account_circle_24px"
+            android:title="@string/side_nav_profile_title" />
+        <item
+            android:id="@+id/nav_category"
+            android:icon="@drawable/category_24px"
+            android:title="Category" />
+
+        <item
+            android:id="@+id/nav_orders"
+            android:icon="@drawable/cake_24px"
+            android:title="@string/side_nav_orders_title" />
+
+        <item
+            android:id="@+id/nav_wishlist"
+            android:icon="@drawable/favorite_24px"
+            android:title="@string/side_nav_wishlist_title" />
+
+        <item
+            android:id="@+id/nav_cart"
+            android:icon="@drawable/shopping_cart_24px"
+            android:title="@string/side_nav_cart_title" />
+
+        <item
+            android:id="@+id/nav_delivery_areas"
+            android:icon="@drawable/chat_24px"
+            android:title="Delivery Areas" />
+
+        <item
+            android:id="@+id/nav_message"
+            android:icon="@drawable/chat_24px"
+            android:title="@string/side_nav_message_title" />
+
+        <item
+            android:id="@+id/nav_setting"
+            android:icon="@drawable/rule_settings_24px"
+            android:title="@string/side_nav_setting_title" />
+
+
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/nav_login"
+            android:icon="@drawable/login_24px"
+            android:title="@string/side_nav_login_title" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logout_24px"
+            android:title="@string/side_nav_logout_title" />
+    </group>
+
+</menu>
