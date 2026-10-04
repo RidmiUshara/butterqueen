@@ -1,5 +1,7 @@
 package lk.jiat.butterqueen.model;
 
+import com.google.firebase.firestore.Exclude;
+
 public class User {
 
     private String id;
@@ -101,6 +103,7 @@ public class User {
         this.createdAtMillis = createdAtMillis;
     }
 
+    @Exclude
     public String getFullName() {
         return firstName + " " + lastName;
     }

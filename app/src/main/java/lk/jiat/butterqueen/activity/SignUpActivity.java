@@ -144,7 +144,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 userId,
                                 firstName,
                                 lastName,
-                                email,
+                                firebaseAuth.getCurrentUser().getEmail(),
                                 birthday,
                                 "",
                                 "",
