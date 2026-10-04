@@ -12,6 +12,7 @@ public class Order {
     private int totalItems;
 
     private String paymentMethod;
+    private String paymentStatus;
     private String orderStatus; // Placed, Preparing, Out for Delivery, Delivered, Cancelled
     private long createdAtMillis;
 
@@ -95,6 +96,14 @@ public class Order {
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public String getOrderStatus() {

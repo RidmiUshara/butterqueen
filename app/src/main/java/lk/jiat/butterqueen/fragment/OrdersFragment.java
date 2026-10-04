@@ -114,6 +114,8 @@ public class OrdersFragment extends Fragment {
                     StringBuilder details = new StringBuilder();
                     details.append("Status: ").append(order.getOrderStatus())
                             .append("\nPayment: ").append(order.getPaymentMethod())
+                            .append(" / ").append(order.getPaymentStatus() == null
+                                    ? "pending" : order.getPaymentStatus())
                             .append("\n\n");
                     for (DocumentSnapshot doc : snapshot) {
                         OrderItem item = doc.toObject(OrderItem.class);

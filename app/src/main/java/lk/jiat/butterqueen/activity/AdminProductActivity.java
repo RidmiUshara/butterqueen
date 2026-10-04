@@ -85,6 +85,7 @@ public class AdminProductActivity extends AppCompatActivity {
                         Category category = doc.toObject(Category.class);
                         if (category != null) {
                             category.setId(doc.getId());
+                            if (doc.getBoolean("active") == null) category.setActive(true);
                             categories.add(category);
                             labels.add(category.getName() + (category.isActive() ? "" : " (hidden)"));
                         }
@@ -127,7 +128,14 @@ public class AdminProductActivity extends AppCompatActivity {
                     }
                     nameInput.setText(editingProduct.getName());
                     descriptionInput.setText(editingProduct.getDescription());
-                    priceInput.setText(String.format(Locale.US, "%.2f", editingProduct.getPrice()));
+                    if (UnitPricing.isSupported(editingProduct.getUnitType())) {
+                        priceInput.setText(String.format(Locale.US, "%.2f", editingProduct.getPrice()));
+                    } else {
+                        priceInput.setText("");
+                        priceInput.setHint("Enter reviewed price per new unit");
+                        Toast.makeText(this, "Review this old box/pack price before saving",
+                                Toast.LENGTH_LONG).show();
+                    }
                     imageUrlInput.setText(editingProduct.getImageUrl());
                     availableSwitch.setChecked(!Boolean.FALSE.equals(doc.getBoolean("available")));
                     for (int i = 0; i < categories.size(); i++) {
@@ -227,12 +235,12 @@ public class AdminProductActivity extends AppCompatActivity {
         fields.put("cakeType", cakeType);
         fields.put("imageUrl", imageUrl);
         fields.put("available", availableSwitch.isChecked());
+        fields.put("customizable", UnitPricing.isKg(unit));
         saveButton.setEnabled(false);
         if (editingProduct == null) {
             fields.put("createdAtMillis", System.currentTimeMillis());
             fields.put("rating", 0.0);
             fields.put("stock", 0);
-            fields.put("customizable", UnitPricing.isKg(unit));
             ref.set(fields).addOnSuccessListener(unused -> saved())
                     .addOnFailureListener(error -> failed(error.getMessage()));
         } else {

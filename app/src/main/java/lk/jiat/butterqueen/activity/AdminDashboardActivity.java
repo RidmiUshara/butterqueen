@@ -116,6 +116,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                         Product product = doc.toObject(Product.class);
                         if (product == null) continue;
                         product.setId(doc.getId());
+                        if (doc.getBoolean("available") == null) product.setAvailable(true);
                         String unit = UnitPricing.normalize(product.getUnitType(),
                                 product.getCategoryName());
                         String subtitle = (product.getCategoryName() == null

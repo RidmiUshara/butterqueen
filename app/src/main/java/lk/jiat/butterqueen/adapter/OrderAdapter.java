@@ -59,9 +59,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 "Date: " + sdf.format(order.getCreatedAtMillis())
         );
 
-        holder.binding.orderPaymentTextView.setText(
-                "Payment: " + formatPaymentMethod(order.getPaymentMethod())
-        );
+        String paymentText = "Payment: " + formatPaymentMethod(order.getPaymentMethod());
+        if (order.getPaymentStatus() != null && !order.getPaymentStatus().isEmpty()) {
+            paymentText += " • " + order.getPaymentStatus().replace('_', ' ');
+        }
+        holder.binding.orderPaymentTextView.setText(paymentText);
 
         holder.binding.orderStatusTextView.setText(
                 "Status: " + formatStatus(order.getOrderStatus())
