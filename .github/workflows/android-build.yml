@@ -1,0 +1,36 @@
+name: Android build
+on:
+  push:
+  pull_request:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Create build-only Firebase configuration
+        shell: bash
+        run: |
+          cat > app/google-services.json <<'JSON'
+          {
+            "project_info": {
+              "project_number": "123456789012",
+              "project_id": "butterqueen-build-only",
+              "storage_bucket": "butterqueen-build-only.appspot.com"
+            },
+            "client": [{
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789012:android:0123456789abcdef",
+                "android_client_info": {"package_name": "lk.jiat.butterqueen"}
+              },
+              "api_key": [{"current_key": "ci-placeholder"}]
+            }],
+            "configuration_version": "1"
+          }
+          JSON
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
