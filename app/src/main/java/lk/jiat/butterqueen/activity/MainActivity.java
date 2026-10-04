@@ -37,6 +37,7 @@ import lk.jiat.butterqueen.fragment.SettingFragment;
 import lk.jiat.butterqueen.fragment.WishlistFragment;
 import lk.jiat.butterqueen.fragment.cartFragment;
 import lk.jiat.butterqueen.fragment.messageFragment;
+import lk.jiat.butterqueen.model.Category;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -227,6 +228,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void showCategoryProducts(Category category) {
+        HomeFragment fragment = new HomeFragment();
+        Bundle args = new Bundle();
+        args.putString("category_id", category.getId());
+        args.putString("category_name", category.getName());
+        args.putString("category_unit", category.getUnitType());
+        fragment.setArguments(args);
+        loadFragment(fragment, category.getName());
     }
 
     private void loadFragment(Fragment fragment, String title) {

@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+import lk.jiat.butterqueen.activity.MainActivity;
 import lk.jiat.butterqueen.adapter.CategoryAdapter;
 import lk.jiat.butterqueen.databinding.FragmentCategoryBinding;
 import lk.jiat.butterqueen.model.Category;
@@ -46,16 +47,25 @@ public class CategoryFragment extends Fragment {
 
         binding.recyclerViewCategories.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
-        adapter = new CategoryAdapter(categoryList, null);
+        adapter = new CategoryAdapter(categoryList, category -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).showCategoryProducts(category);
+            }
+        });
         binding.recyclerViewCategories.setAdapter(adapter);
+    }
 
-        loadCategories();
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (binding != null && firestore != null) loadCategories();
     }
 
     private void loadCategories() {
         firestore.collection("categories")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (binding == null) return;
                     categoryList.clear();
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {

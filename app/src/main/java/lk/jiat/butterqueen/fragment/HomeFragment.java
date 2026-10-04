@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore firestore;
     private String selectedCategory = "ALL";
     private String selectedCategoryName = "ALL";
+    private String selectedCategoryUnit = "";
     private String selectedCakeType = "ALL";
 
     public HomeFragment() {
@@ -60,14 +61,34 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         firestore = FirebaseFirestore.getInstance();
+        Bundle args = getArguments();
+        if (args != null) {
+            selectedCategory = args.getString("category_id", "ALL");
+            selectedCategoryName = args.getString("category_name", "ALL");
+            selectedCategoryUnit = args.getString("category_unit", "");
+        }
 
         setupCategoryRecycler();
         setupProductRecycler();
         setupSearch();
         setupActions();
+        updateOccasionVisibility();
+    }
 
-        loadCategories();
-        loadProducts();
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (binding != null && firestore != null) {
+            loadCategories();
+            loadProducts();
+        }
+    }
+
+    private void updateOccasionVisibility() {
+        boolean show = "ALL".equals(selectedCategory)
+                || UnitPricing.isKg(UnitPricing.normalize(
+                        selectedCategoryUnit, selectedCategoryName));
+        binding.cakeOccasionChips.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     private void setupCategoryRecycler() {
@@ -78,10 +99,14 @@ public class HomeFragment extends Fragment {
         categoryAdapter = new CategoryAdapter(categoryList, category -> {
             selectedCategory = category.getId() != null ? category.getId() : "ALL";
             selectedCategoryName = category.getName() != null ? category.getName() : "ALL";
+            selectedCategoryUnit = category.getUnitType();
             if (!UnitPricing.isKg(UnitPricing.normalize(category.getUnitType(), category.getName()))) {
                 selectedCakeType = "ALL";
                 binding.cakeOccasionChips.check(lk.jiat.butterqueen.R.id.chipAllOccasions);
             }
+            binding.cakeOccasionChips.setVisibility(
+                    UnitPricing.isKg(UnitPricing.normalize(category.getUnitType(),
+                            category.getName())) ? View.VISIBLE : View.GONE);
             filterProducts();
         });
 
@@ -136,8 +161,10 @@ public class HomeFragment extends Fragment {
         binding.seeAllTextView.setOnClickListener(v -> {
             selectedCategory = "ALL";
             selectedCategoryName = "ALL";
+            selectedCategoryUnit = "";
             selectedCakeType = "ALL";
             binding.cakeOccasionChips.check(lk.jiat.butterqueen.R.id.chipAllOccasions);
+            binding.cakeOccasionChips.setVisibility(View.VISIBLE);
             binding.searchEditText.setText("");
             filterProducts();
         });
@@ -147,6 +174,7 @@ public class HomeFragment extends Fragment {
         firestore.collection("categories")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (binding == null) return;
                     categoryList.clear();
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
@@ -174,6 +202,7 @@ public class HomeFragment extends Fragment {
         firestore.collection("products")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (binding == null) return;
                     allProducts.clear();
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
@@ -200,6 +229,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void filterProducts() {
+        if (binding == null) return;
         String keyword = "";
 
         if (binding.searchEditText.getText() != null) {
