@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/adminProductBack"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@android:drawable/ic_media_previous"
+            app:title="Product editor" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Add a bakery item"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="20dp"
+            android:text="Cakes are priced per kg. Cupcakes and brownies are priced per piece."
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="14sp" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Product name">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/adminProductName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Description">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/adminProductDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences|textMultiLine"
+                android:minLines="2" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Category"
+            android:textColor="@color/md_theme_onBackground"
+            android:textStyle="bold" />
+        <Spinner
+            android:id="@+id/adminCategorySpinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+        <TextView
+            android:id="@+id/adminUnitHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Price for 1 unit"
+            android:textColor="@color/md_theme_primary"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/adminCakeTypeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cake occasion"
+            android:textColor="@color/md_theme_onBackground"
+            android:textStyle="bold"
+            android:visibility="gone" />
+        <Spinner
+            android:id="@+id/adminCakeTypeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:visibility="gone" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Price in Rs. per unit">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/adminProductPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Image URL (optional)">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/adminImageUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/adminAvailableSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:checked="true"
+            android:text="Available to customers" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/adminSaveProductButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Save product"
+            android:textAllCaps="false"
+            app:cornerRadius="16dp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

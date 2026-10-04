@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
-            android:text="Find your perfect cake for every sweet moment"
+            android:text="Cakes by the kg • cupcakes and brownies by the piece"
             android:textColor="@color/md_theme_onBackground"
             android:textSize="14sp"
             android:alpha="0.75" />
@@ -37,7 +37,7 @@
             android:layout_marginBottom="16dp"
             android:background="@drawable/custom_input_search"
             android:drawableStart="@drawable/search_24px"
-            android:hint="Search cakes"
+            android:hint="Search cakes, cupcakes, brownies"
             android:inputType="text"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
@@ -121,6 +121,43 @@
             android:nestedScrollingEnabled="false"
             android:paddingEnd="8dp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Cake occasions"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cakeOccasionChips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAllOccasions"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="All" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipBirthday"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Birthday cakes" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipWedding"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wedding cakes" />
+        </com.google.android.material.chip.ChipGroup>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -132,7 +169,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Popular Cakes"
+                android:text="Our baked treats"
                 android:textColor="@color/md_theme_onBackground"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -146,6 +183,16 @@
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/emptyProductsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="24dp"
+            android:text="No treats match your search yet."
+            android:textColor="@color/md_theme_onBackground"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewCakes"

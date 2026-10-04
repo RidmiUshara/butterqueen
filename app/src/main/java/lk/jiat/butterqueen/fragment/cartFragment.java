@@ -139,7 +139,7 @@ public class cartFragment extends Fragment {
         int totalItems = CartManager.getTotalItems();
         double totalPrice = CartManager.getTotalPrice();
 
-        binding.totalItemsTextView.setText("Items: " + totalItems);
+        binding.totalItemsTextView.setText("Products: " + totalItems);
         binding.totalPriceTextView.setText(
                 String.format(Locale.getDefault(), "Total: Rs. %.2f", totalPrice)
         );

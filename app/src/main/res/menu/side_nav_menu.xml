@@ -25,6 +25,12 @@
             android:title="@string/side_nav_orders_title" />
 
         <item
+            android:id="@+id/nav_admin"
+            android:icon="@drawable/cake_24px"
+            android:title="Bakery Studio"
+            android:visible="false" />
+
+        <item
             android:id="@+id/nav_wishlist"
             android:icon="@drawable/favorite_24px"
             android:title="@string/side_nav_wishlist_title" />

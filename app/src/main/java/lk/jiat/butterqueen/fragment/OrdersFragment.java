@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -20,10 +21,13 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import lk.jiat.butterqueen.adapter.OrderAdapter;
 import lk.jiat.butterqueen.databinding.FragmentOrdersBinding;
 import lk.jiat.butterqueen.model.Order;
+import lk.jiat.butterqueen.model.OrderItem;
+import lk.jiat.butterqueen.model.UnitPricing;
 
 public class OrdersFragment extends Fragment {
 
@@ -52,7 +56,7 @@ public class OrdersFragment extends Fragment {
         firestore = FirebaseFirestore.getInstance();
 
         binding.ordersRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new OrderAdapter(orderList);
+        adapter = new OrderAdapter(orderList, this::showOrderDetails);
         binding.ordersRecyclerView.setAdapter(adapter);
 
         loadOrders();
@@ -99,6 +103,40 @@ public class OrdersFragment extends Fragment {
                     if (isEmpty) {
                         binding.emptyOrdersTextView.setText("No orders yet");
                     }
+                });
+    }
+
+    private void showOrderDetails(Order order) {
+        firestore.collection("orders").document(order.getOrderId())
+                .collection("items").get()
+                .addOnSuccessListener(snapshot -> {
+                    if (!isAdded()) return;
+                    StringBuilder details = new StringBuilder();
+                    details.append("Status: ").append(order.getOrderStatus())
+                            .append("\nPayment: ").append(order.getPaymentMethod())
+                            .append("\n\n");
+                    for (DocumentSnapshot doc : snapshot) {
+                        OrderItem item = doc.toObject(OrderItem.class);
+                        if (item == null) continue;
+                        details.append(item.getProductName()).append(" • ")
+                                .append(UnitPricing.quantityLabel(item.getQuantity(),
+                                        item.getUnitType()))
+                                .append(String.format(Locale.getDefault(),
+                                        " × Rs. %.2f = Rs. %.2f\n",
+                                        item.getUnitPrice(), item.getItemTotal()));
+                    }
+                    if (snapshot.isEmpty()) details.append("No item details recorded\n");
+                    details.append(String.format(Locale.getDefault(),
+                            "\nTotal: Rs. %.2f", order.getTotalAmount()));
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Order " + order.getOrderId())
+                            .setMessage(details.toString())
+                            .setPositiveButton("Close", null)
+                            .show();
+                })
+                .addOnFailureListener(error -> {
+                    if (isAdded()) Toast.makeText(requireContext(),
+                            "Could not load order details", Toast.LENGTH_LONG).show();
                 });
     }
 

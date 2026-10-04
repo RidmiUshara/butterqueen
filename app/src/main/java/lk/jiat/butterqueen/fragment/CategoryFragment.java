@@ -60,7 +60,7 @@ public class CategoryFragment extends Fragment {
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Category category = doc.toObject(Category.class);
-                        if (category != null) {
+                        if (category != null && !Boolean.FALSE.equals(doc.getBoolean("active"))) {
                             category.setId(doc.getId());
                             categoryList.add(category);
                         }

@@ -20,6 +20,7 @@ import java.util.Locale;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.data.WishlistManager;
 import lk.jiat.butterqueen.model.Product;
+import lk.jiat.butterqueen.model.UnitPricing;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
@@ -56,9 +57,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         Product product = productList.get(position);
 
         holder.productNameTextView.setText(product.getName());
-        holder.productDescriptionTextView.setText(product.getDescription());
+        String description = product.getDescription() == null ? "" : product.getDescription();
+        if (product.getCakeType() != null && !product.getCakeType().isEmpty()) {
+            description = Character.toUpperCase(product.getCakeType().charAt(0))
+                    + product.getCakeType().substring(1) + " cake • " + description;
+        }
+        holder.productDescriptionTextView.setText(description);
         holder.productPriceTextView.setText(
-                String.format(Locale.getDefault(), "Rs. %.2f", product.getPrice())
+                UnitPricing.priceLabel(product.getPrice(), UnitPricing.normalize(product.getUnitType(), product.getCategoryName()))
         );
 
         if (product.getImageUrl() != null && !product.getImageUrl().trim().isEmpty()) {

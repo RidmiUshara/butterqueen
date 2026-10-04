@@ -27,6 +27,7 @@ import lk.jiat.butterqueen.adapter.ProductAdapter;
 import lk.jiat.butterqueen.databinding.FragmentHomeBinding;
 import lk.jiat.butterqueen.model.Category;
 import lk.jiat.butterqueen.model.Product;
+import lk.jiat.butterqueen.model.UnitPricing;
 
 public class HomeFragment extends Fragment {
 
@@ -41,6 +42,8 @@ public class HomeFragment extends Fragment {
 
     private FirebaseFirestore firestore;
     private String selectedCategory = "ALL";
+    private String selectedCategoryName = "ALL";
+    private String selectedCakeType = "ALL";
 
     public HomeFragment() {
     }
@@ -73,7 +76,12 @@ public class HomeFragment extends Fragment {
         );
 
         categoryAdapter = new CategoryAdapter(categoryList, category -> {
-            selectedCategory = category.getName() != null ? category.getName() : "ALL";
+            selectedCategory = category.getId() != null ? category.getId() : "ALL";
+            selectedCategoryName = category.getName() != null ? category.getName() : "ALL";
+            if (!UnitPricing.isKg(UnitPricing.normalize(category.getUnitType(), category.getName()))) {
+                selectedCakeType = "ALL";
+                binding.cakeOccasionChips.check(lk.jiat.butterqueen.R.id.chipAllOccasions);
+            }
             filterProducts();
         });
 
@@ -118,8 +126,18 @@ public class HomeFragment extends Fragment {
                 binding.recyclerViewCakes.smoothScrollToPosition(0)
         );
 
+        binding.cakeOccasionChips.setOnCheckedStateChangeListener((group, ids) -> {
+            int id = group.getCheckedChipId();
+            selectedCakeType = id == lk.jiat.butterqueen.R.id.chipBirthday ? "birthday"
+                    : id == lk.jiat.butterqueen.R.id.chipWedding ? "wedding" : "ALL";
+            filterProducts();
+        });
+
         binding.seeAllTextView.setOnClickListener(v -> {
             selectedCategory = "ALL";
+            selectedCategoryName = "ALL";
+            selectedCakeType = "ALL";
+            binding.cakeOccasionChips.check(lk.jiat.butterqueen.R.id.chipAllOccasions);
             binding.searchEditText.setText("");
             filterProducts();
         });
@@ -133,7 +151,7 @@ public class HomeFragment extends Fragment {
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Category category = doc.toObject(Category.class);
-                        if (category != null) {
+                        if (category != null && !Boolean.FALSE.equals(doc.getBoolean("active"))) {
                             category.setId(doc.getId());
                             categoryList.add(category);
                         }
@@ -160,7 +178,9 @@ public class HomeFragment extends Fragment {
 
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         Product product = doc.toObject(Product.class);
-                        if (product != null) {
+                        if (product != null && !Boolean.FALSE.equals(doc.getBoolean("available"))
+                                && UnitPricing.isSupported(product.getUnitType())) {
+                            product.setAvailable(true);
                             product.setId(doc.getId());
                             allProducts.add(product);
                         }
@@ -190,8 +210,10 @@ public class HomeFragment extends Fragment {
 
         for (Product product : allProducts) {
             boolean matchesCategory = selectedCategory.equalsIgnoreCase("ALL")
-                    || (product.getCategoryName() != null
-                    && product.getCategoryName().equalsIgnoreCase(selectedCategory));
+                    || selectedCategory.equals(product.getCategoryId())
+                    || selectedCategoryName.equalsIgnoreCase(product.getCategoryName());
+            boolean matchesOccasion = selectedCakeType.equals("ALL")
+                    || selectedCakeType.equalsIgnoreCase(product.getCakeType());
 
             boolean matchesKeyword =
                     (product.getName() != null
@@ -201,12 +223,14 @@ public class HomeFragment extends Fragment {
                             || (product.getCategoryName() != null
                             && product.getCategoryName().toLowerCase(Locale.getDefault()).contains(keyword));
 
-            if (matchesCategory && matchesKeyword) {
+            if (matchesCategory && matchesOccasion && matchesKeyword) {
                 filteredProducts.add(product);
             }
         }
 
         productAdapter.notifyDataSetChanged();
+        binding.emptyProductsTextView.setVisibility(
+                filteredProducts.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override

@@ -9,6 +9,14 @@ ButterQueen is a Java Android cake ordering app. The current code includes Fireb
 3. Copy the two entries from `local.properties.example` into your existing `local.properties`. Set `MAPS_API_KEY` to a newly issued key restricted to the **Maps SDK for Android**, package `lk.jiat.butterqueen`, and the SHA-1 of the signing certificate(s). Set `PAYHERE_MERCHANT_ID` to the sandbox Merchant ID if you want to test online checkout.
 4. Sync Gradle and run the app. Missing local values allow a build, but maps or sandbox checkout will be unavailable.
 
+## Catalog and ordering
+
+- Create the starter categories **Cakes**, **Cupcakes**, and **Brownies** in Bakery Studio, or add custom categories with a chosen price unit. A product's `unitType` is `kg` or `pcs`; `price` always means the price for **1 kg** or **1 piece**.
+- Cake products can be marked **Birthday**, **Wedding**, or **Other**. Customers choose cake weight in 0.5 kg steps. Cupcakes and brownies use whole pieces. The cart and order items store both the unit and numeric quantity.
+- Existing `box` and `pack` products are hidden from customer browsing until an admin edits the product and confirms its new per-piece price. Remove and re-add old box/pack cart items. Review old product prices before taking orders.
+- The admin menu appears only to a user with a trusted `role: "admin"` in their `users/{uid}` document. The activity checks that role from the server as well. Create and audit admin roles using the Firebase Console or a trusted server; customers must never be able to write their own role. **Deploy and test the candidate rules in `security/` before relying on admin access.**
+- Bakery Studio adds categories and products, lists recent orders, shows their unit-aware line items, and lets an admin change order status. PayHere sandbox orders cannot progress beyond payment pending until a trusted server marks payment verified. Product images currently accept an HTTPS image URL; uploading product photos directly requires a separate reviewed Storage rule and workflow.
+
 ## Payment and data safety
 
 - The client uses the PayHere **sandbox URL only**. A successful SDK activity result records `verification_pending`, never `paid`.

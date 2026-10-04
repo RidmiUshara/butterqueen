@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().findItem(R.id.nav_admin).setVisible(false);
 
         initDrawerHeader();
         listenToDrawerHeaderUser();
@@ -163,6 +164,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             fullName = "ButterQueen User";
                         }
 
+                        navigationView.getMenu().findItem(R.id.nav_admin).setVisible(
+                                "admin".equals(documentSnapshot.getString("role")));
                         headerName.setText(fullName);
                         headerEmail.setText(email != null ? email : "");
 
@@ -191,6 +194,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_orders) {
             loadFragment(new OrdersFragment(), "Orders");
+
+        } else if (id == R.id.nav_admin) {
+            startActivity(new Intent(this, AdminDashboardActivity.class));
 
         } else if (id == R.id.nav_category) {
             loadFragment(new CategoryFragment(), "Category");

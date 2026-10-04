@@ -32,5 +32,5 @@ jobs:
             "configuration_version": "1"
           }
           JSON
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Test unit pricing and build debug APK
+        run: ./gradlew testDebugUnitTest assembleDebug --no-daemon

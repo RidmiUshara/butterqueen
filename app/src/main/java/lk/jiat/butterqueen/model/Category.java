@@ -6,6 +6,7 @@ public class Category {
     private String name;
     private String description;
     private String imageUrl;
+    private String unitType; // kg or pcs
     private boolean active;
     private long createdAtMillis;
 
@@ -63,6 +64,14 @@ public class Category {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(String unitType) {
+        this.unitType = unitType;
     }
 
     public boolean isActive() {

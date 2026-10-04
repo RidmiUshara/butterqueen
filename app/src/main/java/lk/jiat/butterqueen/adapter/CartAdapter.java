@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.model.CartItem;
+import lk.jiat.butterqueen.model.UnitPricing;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
@@ -48,7 +49,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         holder.productNameTextView.setText(cartItem.getProductName());
         holder.productPriceTextView.setText(
-                String.format(Locale.getDefault(), "Rs. %.2f", cartItem.getProductPrice())
+                UnitPricing.priceLabel(cartItem.getProductPrice(), cartItem.getUnitType())
         );
 
         if (cartItem.getProductImageUrl() != null && !cartItem.getProductImageUrl().trim().isEmpty()) {
@@ -61,15 +62,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             holder.productImageView.setImageResource(R.drawable.cake_24px);
         }
 
-        String details = "Unit: " + valueOrDefault(cartItem.getSelectedSize())
-                + " | Flavor: " + valueOrDefault(cartItem.getSelectedFlavor());
-
+        String details = "Quantity: " + UnitPricing.quantityLabel(
+                cartItem.getQuantity(), cartItem.getUnitType());
+        if (cartItem.getSelectedFlavor() != null && !cartItem.getSelectedFlavor().trim().isEmpty()) {
+            details += " • " + cartItem.getSelectedFlavor();
+        }
         if (cartItem.getCakeMessage() != null && !cartItem.getCakeMessage().trim().isEmpty()) {
             details += "\nMessage: " + cartItem.getCakeMessage();
         }
-
         holder.productDetailsTextView.setText(details);
-        holder.quantityTextView.setText(formatQuantity(cartItem.getQuantity()));
+        holder.quantityTextView.setText(UnitPricing.quantityLabel(
+                cartItem.getQuantity(), cartItem.getUnitType()));
 
         holder.itemTotalTextView.setText(
                 String.format(Locale.getDefault(), "Item Total: Rs. %.2f", cartItem.getItemTotal())

@@ -44,6 +44,7 @@ import java.util.concurrent.Executors;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.data.CartManager;
 import lk.jiat.butterqueen.model.CartItem;
+import lk.jiat.butterqueen.model.UnitPricing;
 import lk.jiat.butterqueen.payment.PayHereConfig;
 import lk.payhere.androidsdk.PHConfigs;
 import lk.payhere.androidsdk.PHConstants;
@@ -226,9 +227,9 @@ public class CheckoutActivity extends AppCompatActivity {
     private void loadSummary() {
         int totalItems = CartManager.getTotalItems();
         double subtotal = CartManager.getTotalPrice();
-        double grandTotal = subtotal + currentDeliveryFee;
+        double grandTotal = UnitPricing.roundMoney(subtotal + currentDeliveryFee);
 
-        itemsTextView.setText("Items: " + totalItems);
+        itemsTextView.setText("Products: " + totalItems);
         subtotalTextView.setText(String.format(Locale.getDefault(), "Subtotal: Rs. %.2f", subtotal));
         deliveryFeeTextView.setText(String.format(Locale.getDefault(), "Delivery Fee: Rs. %.2f", currentDeliveryFee));
         totalTextView.setText(String.format(Locale.getDefault(), "Total: Rs. %.2f", grandTotal));
@@ -377,6 +378,14 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
+        for (CartItem item : currentCart) {
+            if (!UnitPricing.isSupported(item.getUnitType())) {
+                Toast.makeText(this, "Remove and re-add items with old box/pack units",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
         String fullName = getText(fullNameEditText);
         String phone = getText(phoneEditText);
         String address = getText(addressEditText);
@@ -440,7 +449,7 @@ public class CheckoutActivity extends AppCompatActivity {
         for (CartItem item : currentCart) {
             subtotal += item.getItemTotal();
         }
-        double totalAmount = subtotal + currentDeliveryFee;
+        double totalAmount = UnitPricing.roundMoney(subtotal + currentDeliveryFee);
 
         String[] nameParts = fullName.trim().split("\\s+", 2);
         String firstName = nameParts.length > 0 ? nameParts[0] : "Customer";
@@ -475,9 +484,8 @@ public class CheckoutActivity extends AppCompatActivity {
         for (CartItem cartItem : currentCart) {
             String itemName = cartItem.getProductName();
 
-            if (cartItem.getSelectedSize() != null && !cartItem.getSelectedSize().trim().isEmpty()) {
-                itemName += " (" + cartItem.getSelectedSize() + ")";
-            }
+            itemName += " (" + UnitPricing.quantityLabel(
+                    cartItem.getQuantity(), cartItem.getUnitType()) + ")";
 
             req.getItems().add(new Item(
                     null,

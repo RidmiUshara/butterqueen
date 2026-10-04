@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lk.jiat.butterqueen.model.CartItem;
+import lk.jiat.butterqueen.model.UnitPricing;
 
 public class CartManager {
 
@@ -123,6 +124,7 @@ public class CartManager {
         }
 
         normalizeCartItem(newItem);
+        newItem.setQuantity(UnitPricing.normalizeQuantity(newItem.getQuantity(), newItem.getUnitType()));
 
         firestore.collection("users")
                 .document(userId)
@@ -223,9 +225,7 @@ public class CartManager {
             return;
         }
 
-        double newQuantity = isKgItem(item)
-                ? item.getQuantity() + 0.5
-                : item.getQuantity() + 1;
+        double newQuantity = item.getQuantity() + UnitPricing.step(item.getUnitType());
 
         firestore.collection("users")
                 .document(userId)
@@ -264,15 +264,13 @@ public class CartManager {
             return;
         }
 
-        double minQuantity = isKgItem(item) ? 0.5 : 1.0;
+        double minQuantity = UnitPricing.step(item.getUnitType());
         if (item.getQuantity() <= minQuantity) {
             if (callback != null) callback.onSuccess();
             return;
         }
 
-        double newQuantity = isKgItem(item)
-                ? item.getQuantity() - 0.5
-                : item.getQuantity() - 1;
+        double newQuantity = item.getQuantity() - UnitPricing.step(item.getUnitType());
 
         firestore.collection("users")
                 .document(userId)
@@ -333,7 +331,7 @@ public class CartManager {
         for (CartItem item : cartItems) {
             total += item.getItemTotal();
         }
-        return total;
+        return UnitPricing.roundMoney(total);
     }
 
     public static int getTotalItems() {
@@ -377,10 +375,6 @@ public class CartManager {
         if (item.getCakeMessage() == null) item.setCakeMessage("");
         if (item.getProductImageUrl() == null) item.setProductImageUrl("");
         if (item.getUnitType() == null) item.setUnitType("");
-    }
-
-    private static boolean isKgItem(CartItem item) {
-        return item.getUnitType() != null && item.getUnitType().equalsIgnoreCase("kg");
     }
 
     private static boolean equalsNormalized(String a, String b) {

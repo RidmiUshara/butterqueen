@@ -12,7 +12,8 @@ public class Product {
     private String imageUrl;
     private boolean available;
     private boolean customizable;
-    private String unitType; // kg, box, pack, piece, qty
+    private String unitType; // kg for cakes; pcs for cupcakes and brownies
+    private String cakeType; // birthday, wedding, other; empty for non-cakes
     private int stock;
     private long createdAtMillis;
 
@@ -135,6 +136,14 @@ public class Product {
 
     public void setUnitType(String unitType) {
         this.unitType = unitType;
+    }
+
+    public String getCakeType() {
+        return cakeType;
+    }
+
+    public void setCakeType(String cakeType) {
+        this.cakeType = cakeType;
     }
 
     public int getStock() {

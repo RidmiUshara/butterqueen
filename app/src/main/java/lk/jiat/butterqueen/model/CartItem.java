@@ -125,6 +125,6 @@ public class CartItem {
     }
 
     public double getItemTotal() {
-        return productPrice * quantity;
+        return UnitPricing.itemTotal(productPrice, quantity);
     }
 }

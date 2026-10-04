@@ -17,10 +17,16 @@ import lk.jiat.butterqueen.model.Order;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private final List<Order> orderList;
+    public interface OnOrderClickListener {
+        void onOrderClick(Order order);
+    }
 
-    public OrderAdapter(List<Order> orderList) {
+    private final List<Order> orderList;
+    private final OnOrderClickListener listener;
+
+    public OrderAdapter(List<Order> orderList, OnOrderClickListener listener) {
         this.orderList = orderList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -43,7 +49,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
                 : "ORDER";
 
         holder.binding.orderNameTextView.setText("Order #" + shortOrderId);
-        holder.binding.orderQtyTextView.setText("Items: " + order.getTotalItems());
+        holder.binding.orderQtyTextView.setText("Products: " + order.getTotalItems());
         holder.binding.orderPriceTextView.setText(
                 String.format(Locale.getDefault(), "Rs. %.2f", order.getTotalAmount())
         );
@@ -63,6 +69,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.binding.orderStatusTextView.setTextColor(getStatusColor(order.getOrderStatus()));
 
         holder.binding.orderImageView.setImageResource(R.drawable.cake_24px);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onOrderClick(order);
+        });
     }
 
     @Override
