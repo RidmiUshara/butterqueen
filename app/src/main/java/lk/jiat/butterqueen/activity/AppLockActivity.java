@@ -7,12 +7,16 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -46,7 +50,13 @@ public final class AppLockActivity extends AppCompatActivity {
         }
         ownerUid = user.getUid();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_app_lock);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.lockRoot), (view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() { moveTaskToBack(true); }
         });

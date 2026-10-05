@@ -8,10 +8,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,7 +64,13 @@ public final class OrderReceiptActivity extends AppCompatActivity {
             return;
         }
         ownerUid = user.getUid();
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_order_receipt);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.receiptRoot), (view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
         findViewById(R.id.receiptBack).setOnClickListener(v -> finish());
         findViewById(R.id.receiptDownload).setOnClickListener(v -> createPdf.launch(fileName()));
         load();
