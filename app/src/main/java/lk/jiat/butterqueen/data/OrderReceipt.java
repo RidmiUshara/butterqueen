@@ -39,7 +39,8 @@ public final class OrderReceipt {
     }
 
     public String paymentNotice() {
-        if ("paid".equalsIgnoreCase(paymentStatus)) return "Payment is recorded as paid.";
+        if ("paid".equalsIgnoreCase(paymentStatus))
+            return "The order record lists payment as paid. Confirm with ButterQueen; this PDF is not proof of payment.";
         if ("payhere".equalsIgnoreCase(paymentMethod))
             return "Sandbox payment awaits independent verification. This order record is not proof of payment.";
         if ("cash_on_delivery".equalsIgnoreCase(paymentMethod))

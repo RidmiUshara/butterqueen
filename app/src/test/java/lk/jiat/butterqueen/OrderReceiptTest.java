@@ -26,4 +26,13 @@ public class OrderReceiptTest {
 
         assertTrue(record.paymentNotice().contains("due on delivery"));
     }
+
+    @Test
+    public void recordedPaidStatusDoesNotClaimIndependentVerification() {
+        OrderReceipt record = new OrderReceipt();
+        record.paymentMethod = "payhere";
+        record.paymentStatus = "paid";
+
+        assertTrue(record.paymentNotice().contains("not proof of payment"));
+    }
 }
