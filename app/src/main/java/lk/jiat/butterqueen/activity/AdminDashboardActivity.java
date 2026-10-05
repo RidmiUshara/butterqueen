@@ -204,6 +204,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
                             .setTitle("Order " + order.getId())
                             .setMessage(message.toString())
                             .setNegativeButton("Close", null)
+                            .setNeutralButton("Receipt PDF", (dialog, which) ->
+                                    startActivity(OrderReceiptActivity.intentForAdmin(
+                                            this, order.getId())))
                             .setPositiveButton("Update status",
                                     (dialog, which) -> chooseStatus(order))
                             .show();

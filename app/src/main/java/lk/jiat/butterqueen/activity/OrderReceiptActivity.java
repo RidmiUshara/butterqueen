@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import lk.jiat.butterqueen.R;
+import lk.jiat.butterqueen.data.AdminAccess;
 import lk.jiat.butterqueen.data.OrderReceipt;
 import lk.jiat.butterqueen.data.OrderReceiptPdf;
 import lk.jiat.butterqueen.model.OrderItem;
@@ -39,11 +40,14 @@ import lk.jiat.butterqueen.model.UnitPricing;
 /** Loads an owned Firestore order and saves its current payment state as a PDF. */
 public final class OrderReceiptActivity extends AppCompatActivity {
     private static final String EXTRA_ORDER_ID = "order_id";
+    private static final String EXTRA_ADMIN_VIEW = "admin_view";
     private final ExecutorService pdfWorker = Executors.newSingleThreadExecutor();
     private String ownerUid;
     private String orderId;
     private boolean loading;
     private boolean loaded;
+    private boolean adminView;
+    private boolean adminVerified;
 
     private final ActivityResultLauncher<String> createPdf = registerForActivityResult(
             new ActivityResultContracts.CreateDocument("application/pdf"), uri -> {
@@ -52,6 +56,10 @@ public final class OrderReceiptActivity extends AppCompatActivity {
 
     public static Intent intentFor(Context context, String orderId) {
         return new Intent(context, OrderReceiptActivity.class).putExtra(EXTRA_ORDER_ID, orderId);
+    }
+
+    public static Intent intentForAdmin(Context context, String orderId) {
+        return intentFor(context, orderId).putExtra(EXTRA_ADMIN_VIEW, true);
     }
 
     @Override
@@ -64,6 +72,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
             return;
         }
         ownerUid = user.getUid();
+        adminView = getIntent().getBooleanExtra(EXTRA_ADMIN_VIEW, false);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_order_receipt);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.receiptRoot), (view, insets) -> {
@@ -73,7 +82,16 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         });
         findViewById(R.id.receiptBack).setOnClickListener(v -> finish());
         findViewById(R.id.receiptDownload).setOnClickListener(v -> createPdf.launch(fileName()));
-        load();
+        if (adminView) {
+            AdminAccess.verify(allowed -> {
+                if (isFinishing() || isDestroyed()) return;
+                if (!allowed || !sameAccount()) finish();
+                else {
+                    adminVerified = true;
+                    load();
+                }
+            });
+        } else load();
     }
 
     @Override
@@ -119,7 +137,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         db.collection("orders").document(orderId).get(Source.SERVER)
                 .addOnSuccessListener(doc -> {
                     if (!sameAccount() || !doc.exists()
-                            || !ownerUid.equals(doc.getString("userId"))) {
+                            || (!ownerUid.equals(doc.getString("userId")) && !adminVerified)) {
                         if (!isFinishing()) finish();
                         return;
                     }
