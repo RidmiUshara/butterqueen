@@ -55,11 +55,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         if (cartItem.getProductImageUrl() != null && !cartItem.getProductImageUrl().trim().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(cartItem.getProductImageUrl())
-                    .placeholder(R.drawable.cake_24px)
-                    .error(R.drawable.cake_24px)
+                    .placeholder(R.drawable.cake_wallpaper)
+                    .error(R.drawable.cake_wallpaper)
                     .into(holder.productImageView);
         } else {
-            holder.productImageView.setImageResource(R.drawable.cake_24px);
+            holder.productImageView.setImageResource(R.drawable.cake_wallpaper);
         }
 
         String details = "Quantity: " + UnitPricing.quantityLabel(

@@ -10,13 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="18dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hello, Queen 👑"
-            android:textColor="@color/md_theme_onBackground"
+            android:textColor="@color/md_theme_onSurface"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -26,29 +26,32 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
             android:text="Cakes by the kg • cupcakes and brownies by the piece"
-            android:textColor="@color/md_theme_onBackground"
-            android:textSize="14sp"
-            android:alpha="0.75" />
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
 
         <EditText
             android:id="@+id/searchEditText"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="48dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/custom_input_search"
-            android:drawableStart="@drawable/search_24px"
+            android:drawableStart="@drawable/ic_bq_search"
+            android:drawablePadding="8dp"
+            android:drawableTint="@color/md_theme_onSurfaceVariant"
             android:hint="Search cakes, cupcakes, brownies"
+            android:textColor="@color/md_theme_onSurface"
+            android:textColorHint="@color/md_theme_onSurfaceVariant"
             android:inputType="text"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:textSize="14sp" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="190dp"
+            android:layout_height="205dp"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="6dp">
+            app:cardElevation="0dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -64,7 +67,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#55000000" />
+                    android:background="#66000000" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -107,9 +110,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Categories"
+            android:text="Shop by category"
             android:textColor="@color/md_theme_onBackground"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView

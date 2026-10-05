@@ -138,12 +138,12 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         if (selectedProduct.getImageUrl() != null && !selectedProduct.getImageUrl().trim().isEmpty()) {
             Glide.with(this).load(selectedProduct.getImageUrl())
-                    .placeholder(R.drawable.cake_24px)
-                    .error(R.drawable.cake_24px).into(productImageView);
+                    .placeholder(R.drawable.cake_wallpaper)
+                    .error(R.drawable.cake_wallpaper).into(productImageView);
         } else if (selectedProduct.getImageResId() != 0) {
             productImageView.setImageResource(selectedProduct.getImageResId());
         } else {
-            productImageView.setImageResource(R.drawable.cake_24px);
+            productImageView.setImageResource(R.drawable.cake_wallpaper);
         }
     }
 
@@ -185,6 +185,6 @@ public class ProductDetailsActivity extends AppCompatActivity {
         if (selectedProduct == null) return;
         wishlistButton.setColorFilter(ContextCompat.getColor(this,
                 WishlistManager.isWishlisted(selectedProduct.getId())
-                        ? R.color.md_theme_primary : android.R.color.white));
+                        ? R.color.md_theme_primary : R.color.md_theme_onSurface));
     }
 }

@@ -14,7 +14,8 @@
             android:id="@+id/adminProductBack"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@android:drawable/ic_media_previous"
+            app:navigationIcon="@drawable/ic_bq_back"
+            app:navigationIconTint="@color/md_theme_onSurface"
             app:title="Product editor" />
         <TextView
             android:layout_width="match_parent"
@@ -30,7 +31,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="20dp"
             android:text="Cakes are priced per kg. Cupcakes and brownies are priced per piece."
-            android:textColor="@color/md_theme_onBackground"
+            android:textColor="@color/md_theme_onSurfaceVariant"
             android:textSize="14sp" />
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -109,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textUri" />
         </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/adminAvailableSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

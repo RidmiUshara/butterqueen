@@ -5,7 +5,7 @@
     android:layout_height="140dp"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="4dp">
+    app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,18 +22,19 @@
                 android:layout_height="match_parent"
                 android:contentDescription="Cake Image"
                 android:scaleType="centerCrop"
-                android:src="@drawable/cake_24px" />
+                android:src="@drawable/cake_wallpaper" />
 
             <ImageButton
                 android:id="@+id/wishlistButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="top|end"
                 android:layout_margin="8dp"
-                android:background="@android:color/transparent"
+                android:background="@drawable/bg_bq_icon_surface"
                 android:contentDescription="Wishlist"
-                android:padding="6dp"
-                android:src="@drawable/favorite_24px" />
+                android:padding="12dp"
+                android:src="@drawable/ic_bq_favorite"
+                android:tint="@color/md_theme_onSurface" />
 
         </FrameLayout>
 

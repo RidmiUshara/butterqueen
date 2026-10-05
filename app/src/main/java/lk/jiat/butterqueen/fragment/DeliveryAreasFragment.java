@@ -1,6 +1,7 @@
 package lk.jiat.butterqueen.fragment;
 
 import android.graphics.Color;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,9 +21,11 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.util.Locale;
 
+import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.databinding.FragmentDeliveryAreasBinding;
 
 public class DeliveryAreasFragment extends Fragment implements OnMapReadyCallback {
@@ -78,7 +81,13 @@ public class DeliveryAreasFragment extends Fragment implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
+        if (!isAdded() || binding == null) return;
         googleMap = map;
+
+        boolean dark = (requireContext().getResources().getConfiguration().uiMode
+                & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        if (dark) googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+                requireContext(), R.raw.bq_map_dark));
 
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(true);
@@ -167,11 +176,13 @@ public class DeliveryAreasFragment extends Fragment implements OnMapReadyCallbac
             binding.priceTextView.setText(
                     String.format(Locale.getDefault(), "Charge: Rs. %.2f", result.price)
             );
-            binding.statusTextView.setTextColor(Color.parseColor("#0D47A1"));
+            binding.statusTextView.setTextColor(androidx.core.content.ContextCompat.getColor(
+                    requireContext(), R.color.bq_map_info));
         } else {
             binding.statusTextView.setText("Outside delivery area");
             binding.priceTextView.setText("Charge: Not available");
-            binding.statusTextView.setTextColor(Color.parseColor("#B71C1C"));
+            binding.statusTextView.setTextColor(androidx.core.content.ContextCompat.getColor(
+                    requireContext(), R.color.bq_map_error));
         }
     }
 
@@ -210,7 +221,8 @@ public class DeliveryAreasFragment extends Fragment implements OnMapReadyCallbac
 
     private void showDefaultInfo() {
         binding.statusTextView.setText("No location selected yet");
-        binding.statusTextView.setTextColor(Color.parseColor("#0D47A1"));
+        binding.statusTextView.setTextColor(androidx.core.content.ContextCompat.getColor(
+                requireContext(), R.color.bq_map_info));
         binding.distanceTextView.setText("Distance: -");
         binding.priceTextView.setText("Charge: -");
         binding.selectedPointTextView.setText("Selected point: -");

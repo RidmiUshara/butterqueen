@@ -3,37 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="22dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="@color/md_theme_primaryContainer">
-
+    android:layout_margin="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/md_theme_surfaceContainerLow"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/md_theme_outlineVariant"
+    app:strokeWidth="1dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/categoryImageView"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:src="@drawable/cake_24px"
-            android:scaleType="centerInside"
-            android:contentDescription="Category Icon" />
-
+        android:padding="10dp">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            app:cardCornerRadius="13dp"
+            app:cardElevation="0dp">
+            <ImageView
+                android:id="@+id/categoryImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:contentDescription="Category photo"
+                android:src="@drawable/cake_wallpaper" />
+        </com.google.android.material.card.MaterialCardView>
         <TextView
             android:id="@+id/categoryNameTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Birthday Cakes"
-            android:textColor="@color/md_theme_onPrimaryContainer"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:gravity="center" />
-
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="3dp"
+            android:gravity="center"
+            android:maxLines="2"
+            android:textColor="@color/md_theme_onSurface"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

@@ -100,16 +100,19 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/helpCall"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_marginTop="12dp"
+            app:icon="@drawable/ic_bq_phone"
+            app:iconTint="@color/md_theme_onPrimary"
             android:text="Call 0763227525" />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/helpEmail"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="52dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="18dp"
-            android:text="Email info@butterqueen.com" />
+            android:text="Email info@butterqueen.com"
+            app:icon="@drawable/ic_bq_mail" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

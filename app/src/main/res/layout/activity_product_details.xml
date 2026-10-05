@@ -22,34 +22,36 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:contentDescription="Product Image"
-                android:src="@drawable/cake_24px" />
+                android:src="@drawable/cake_wallpaper" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#26000000" />
+                android:background="#33000000" />
 
             <ImageButton
                 android:id="@+id/backButton"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="top|start"
                 android:layout_margin="16dp"
-                android:background="@drawable/bg_nav_avatar"
+                android:background="@drawable/bg_bq_icon_surface"
                 android:contentDescription="Back"
                 android:padding="10dp"
-                android:src="@android:drawable/ic_media_previous" />
+                android:src="@drawable/ic_bq_back"
+                android:tint="@color/md_theme_onSurface" />
 
             <ImageButton
                 android:id="@+id/wishlistButton"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="top|end"
                 android:layout_margin="16dp"
-                android:background="@drawable/bg_nav_avatar"
+                android:background="@drawable/bg_bq_icon_surface"
                 android:contentDescription="Wishlist"
                 android:padding="10dp"
-                android:src="@drawable/favorite_24px" />
+                android:src="@drawable/ic_bq_favorite"
+                android:tint="@color/md_theme_onSurface" />
         </FrameLayout>
 
         <LinearLayout
@@ -148,28 +150,33 @@
                     android:orientation="horizontal">
                     <ImageButton
                         android:id="@+id/minusQtyButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_nav_avatar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_bq_stepper"
                         android:contentDescription="Decrease quantity"
-                        android:src="@android:drawable/ic_media_previous" />
+                        android:padding="12dp"
+                        android:src="@drawable/ic_bq_remove"
+                        android:tint="@color/bq_stepper_tint" />
                     <TextView
                         android:id="@+id/quantityTextView"
-                        android:layout_width="wrap_content"
+                        android:layout_width="72dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="18dp"
-                        android:layout_marginEnd="18dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:gravity="center"
                         android:text="1"
                         android:textColor="@color/md_theme_onBackground"
                         android:textSize="18sp"
                         android:textStyle="bold" />
                     <ImageButton
                         android:id="@+id/plusQtyButton"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:background="@drawable/bg_nav_avatar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_bq_stepper"
                         android:contentDescription="Increase quantity"
-                        android:src="@android:drawable/ic_input_add" />
+                        android:padding="12dp"
+                        android:src="@drawable/ic_bq_add"
+                        android:tint="@color/bq_stepper_tint" />
                 </LinearLayout>
             </LinearLayout>
 

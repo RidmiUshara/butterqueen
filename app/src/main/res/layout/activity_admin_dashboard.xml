@@ -9,7 +9,8 @@
         android:id="@+id/adminBack"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@android:drawable/ic_media_previous"
+        app:navigationIcon="@drawable/ic_bq_back"
+        app:navigationIconTint="@color/md_theme_onSurface"
         app:title="Bakery Studio" />
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,18 +31,23 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Products, categories and customer orders in one place"
-            android:textColor="@color/md_theme_onBackground"
+            android:textColor="@color/md_theme_onSurfaceVariant"
             android:textSize="14sp" />
-        <LinearLayout
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/adminTabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:singleSelection="true"
+            app:selectionRequired="true">
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/adminProductsTab"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
+                android:checked="true"
                 android:text="Products"
                 android:textAllCaps="false" />
             <com.google.android.material.button.MaterialButton
@@ -49,11 +55,10 @@
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:text="Orders"
                 android:textAllCaps="false" />
-        </LinearLayout>
+        </com.google.android.material.button.MaterialButtonToggleGroup>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

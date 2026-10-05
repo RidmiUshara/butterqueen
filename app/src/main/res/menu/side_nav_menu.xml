@@ -3,64 +3,61 @@
 
     <group android:checkableBehavior="single">
         <item
-
             android:id="@+id/nav_home"
-
-            android:icon="@drawable/home_24px"
-            android:title="@string/side_nav_home_title"/>
-<!--            android:checked="true"-->
+            android:icon="@drawable/ic_bq_home"
+            android:title="@string/side_nav_home_title" />
 
         <item
             android:id="@+id/nav_profile"
-            android:icon="@drawable/account_circle_24px"
+            android:icon="@drawable/ic_bq_profile"
             android:title="@string/side_nav_profile_title" />
         <item
             android:id="@+id/nav_category"
-            android:icon="@drawable/category_24px"
+            android:icon="@drawable/ic_bq_categories"
             android:title="Category" />
 
         <item
             android:id="@+id/nav_orders"
-            android:icon="@drawable/cake_24px"
+            android:icon="@drawable/ic_bq_orders"
             android:title="@string/side_nav_orders_title" />
 
         <item
             android:id="@+id/nav_admin"
-            android:icon="@drawable/cake_24px"
+            android:icon="@drawable/ic_bq_store"
             android:title="Bakery Studio"
             android:visible="false" />
 
         <item
             android:id="@+id/nav_wishlist"
-            android:icon="@drawable/favorite_24px"
+            android:icon="@drawable/ic_bq_favorite"
             android:title="@string/side_nav_wishlist_title" />
 
         <item
             android:id="@+id/nav_cart"
-            android:icon="@drawable/shopping_cart_24px"
+            android:icon="@drawable/ic_bq_cart"
             android:title="@string/side_nav_cart_title" />
 
         <item
             android:id="@+id/nav_delivery_areas"
-            android:icon="@drawable/chat_24px"
+            android:icon="@drawable/ic_bq_delivery"
             android:title="Delivery Areas" />
 
         <item
             android:id="@+id/nav_message"
-            android:icon="@drawable/chat_24px"
-            android:title="@string/side_nav_message_title" />
+            android:icon="@drawable/ic_bq_message"
+            android:title="Contact" />
 
         <item
             android:id="@+id/nav_setting"
-            android:icon="@drawable/rule_settings_24px"
+            android:icon="@drawable/ic_bq_settings"
             android:title="@string/side_nav_setting_title" />
         <item
             android:id="@+id/nav_help"
-            android:icon="@drawable/chat_24px"
+            android:icon="@drawable/ic_bq_help"
             android:title="Help" />
         <item
             android:id="@+id/nav_about"
-            android:icon="@drawable/cake_24px"
+            android:icon="@drawable/ic_bq_info"
             android:title="About" />
 
 
@@ -69,12 +66,12 @@
     <group>
         <item
             android:id="@+id/nav_login"
-            android:icon="@drawable/login_24px"
+            android:icon="@drawable/ic_bq_login"
             android:title="@string/side_nav_login_title" />
 
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/logout_24px"
+            android:icon="@drawable/ic_bq_logout"
             android:title="@string/side_nav_logout_title" />
     </group>
 

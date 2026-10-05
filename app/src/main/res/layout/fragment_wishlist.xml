@@ -21,10 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="12dp"
-        android:text="Your favorite cakes"
-        android:textColor="@color/md_theme_onBackground"
-        android:textSize="14sp"
-        android:alpha="0.75" />
+        android:text="Your favorite treats"
+        android:textColor="@color/md_theme_onSurfaceVariant"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/emptyWishlistTextView"
@@ -32,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="No cakes in wishlist yet"
+        android:text="No treats in your wishlist yet"
         android:textColor="@color/md_theme_onBackground"
         android:textSize="16sp"
         android:visibility="gone" />

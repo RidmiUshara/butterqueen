@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private MaterialToolbar toolbar;
     private BottomNavigationView bottomNavigationView;
     private ActionBarDrawerToggle toggle;
+    private boolean syncingBottomNavigation;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -86,22 +87,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().findItem(R.id.nav_admin).setVisible(false);
+        updateAuthMenu();
 
         initDrawerHeader();
         listenToDrawerHeaderUser();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainContent), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        if (savedInstanceState == null) {
-            loadFragment(new HomeFragment(), "Home");
-            navigationView.setCheckedItem(R.id.nav_home);
-        }
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (syncingBottomNavigation) return true;
             int id = item.getItemId();
 
             if (id == R.id.bottom_home) {
@@ -123,6 +121,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             return false;
         });
+
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment(), "Home");
+            navigationView.setCheckedItem(R.id.nav_home);
+        } else {
+            Fragment restored = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+            if (restored != null) {
+                syncBottomNavigation(restored);
+                syncDrawerSelection(restored);
+                toolbar.setTitle(titleFor(restored));
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (navigationView != null) {
+            updateAuthMenu();
+            Fragment current = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+            if (current != null) syncDrawerSelection(current);
+        }
+    }
+
+    private void updateAuthMenu() {
+        boolean signedIn = firebaseAuth.getCurrentUser() != null;
+        navigationView.getMenu().findItem(R.id.nav_login).setVisible(!signedIn);
+        navigationView.getMenu().findItem(R.id.nav_logout).setVisible(signedIn);
+        if (!signedIn) navigationView.getMenu().findItem(R.id.nav_admin).setVisible(false);
     }
 
     private void initDrawerHeader() {
@@ -140,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (firebaseAuth.getCurrentUser() == null) {
+            updateAuthMenu();
             headerName.setText("Guest User");
             headerEmail.setText("Please sign in");
             headerAvatar.setImageResource(R.drawable.account_circle_24px);
@@ -216,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         } else if (id == R.id.nav_message) {
-            loadFragment(new messageFragment(), "Message");
+            loadFragment(new messageFragment(), "Contact");
 
         } else if (id == R.id.nav_setting) {
             loadFragment(new SettingFragment(), "Settings");
@@ -264,6 +292,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
 
         toolbar.setTitle(title);
+        syncBottomNavigation(fragment);
+        syncDrawerSelection(fragment);
+    }
+
+    private void syncBottomNavigation(Fragment fragment) {
+        int itemId = fragment instanceof HomeFragment ? R.id.bottom_home
+                : fragment instanceof cartFragment ? R.id.bottom_cart
+                : fragment instanceof WishlistFragment ? R.id.bottom_wishlist
+                : fragment instanceof ProfileFragment ? R.id.bottom_profile : 0;
+        bottomNavigationView.setVisibility(itemId == 0 ? View.GONE : View.VISIBLE);
+        if (itemId != 0 && bottomNavigationView.getSelectedItemId() != itemId) {
+            syncingBottomNavigation = true;
+            bottomNavigationView.setSelectedItemId(itemId);
+            syncingBottomNavigation = false;
+        }
+    }
+
+    private void syncDrawerSelection(Fragment fragment) {
+        int itemId = fragment instanceof HomeFragment ? R.id.nav_home
+                : fragment instanceof cartFragment ? R.id.nav_cart
+                : fragment instanceof WishlistFragment ? R.id.nav_wishlist
+                : fragment instanceof ProfileFragment ? R.id.nav_profile
+                : fragment instanceof CategoryFragment ? R.id.nav_category
+                : fragment instanceof OrdersFragment ? R.id.nav_orders
+                : fragment instanceof DeliveryAreasFragment ? R.id.nav_delivery_areas
+                : fragment instanceof SettingFragment ? R.id.nav_setting
+                : fragment instanceof HelpFragment ? R.id.nav_help
+                : fragment instanceof AboutFragment ? R.id.nav_about
+                : fragment instanceof messageFragment ? R.id.nav_message : 0;
+        if (itemId != 0) navigationView.setCheckedItem(itemId);
+    }
+
+    private String titleFor(Fragment fragment) {
+        if (fragment instanceof cartFragment) return "Cart";
+        if (fragment instanceof WishlistFragment) return "Wishlist";
+        if (fragment instanceof ProfileFragment) return "Profile";
+        if (fragment instanceof CategoryFragment) return "Category";
+        if (fragment instanceof OrdersFragment) return "Orders";
+        if (fragment instanceof DeliveryAreasFragment) return "Delivery Areas";
+        if (fragment instanceof SettingFragment) return "Settings";
+        if (fragment instanceof HelpFragment) return "Help";
+        if (fragment instanceof AboutFragment) return "About";
+        if (fragment instanceof messageFragment) return "Contact";
+        return "Home";
     }
 
     private void showLogoutDialog() {

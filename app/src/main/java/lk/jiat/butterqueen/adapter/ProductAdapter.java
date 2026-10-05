@@ -75,13 +75,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         if (product.getImageUrl() != null && !product.getImageUrl().trim().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(product.getImageUrl())
-                    .placeholder(R.drawable.cake_24px)
-                    .error(R.drawable.cake_24px)
+                    .placeholder(R.drawable.cake_wallpaper)
+                    .error(R.drawable.cake_wallpaper)
                     .into(holder.productImageView);
         } else if (product.getImageResId() != 0) {
             holder.productImageView.setImageResource(product.getImageResId());
         } else {
-            holder.productImageView.setImageResource(R.drawable.cake_24px);
+            holder.productImageView.setImageResource(R.drawable.cake_wallpaper);
         }
 
         updateWishlistIcon(holder.wishlistButton, WishlistManager.isWishlisted(product.getId()));
@@ -114,7 +114,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private void updateWishlistIcon(ImageButton button, boolean isWishlisted) {
         int color = isWishlisted
                 ? ContextCompat.getColor(button.getContext(), R.color.md_theme_primary)
-                : ContextCompat.getColor(button.getContext(), android.R.color.darker_gray);
+                : ContextCompat.getColor(button.getContext(), R.color.md_theme_onSurface);
 
         button.setColorFilter(color);
     }

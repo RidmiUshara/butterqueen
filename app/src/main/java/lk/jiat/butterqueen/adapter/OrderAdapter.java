@@ -1,10 +1,11 @@
 package lk.jiat.butterqueen.adapter;
 
-import android.graphics.Color;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
@@ -68,9 +69,10 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.binding.orderStatusTextView.setText(
                 "Status: " + formatStatus(order.getOrderStatus())
         );
-        holder.binding.orderStatusTextView.setTextColor(getStatusColor(order.getOrderStatus()));
+        holder.binding.orderStatusTextView.setTextColor(getStatusColor(
+                holder.itemView.getContext(), order.getOrderStatus()));
 
-        holder.binding.orderImageView.setImageResource(R.drawable.cake_24px);
+        holder.binding.orderImageView.setImageResource(R.drawable.ic_bq_orders);
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onOrderClick(order);
         });
@@ -134,27 +136,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         return status;
     }
 
-    private int getStatusColor(String status) {
-        if (status == null) {
-            return Color.parseColor("#FFA500");
-        }
-
-        if (status.equalsIgnoreCase("placed")
-                || status.equalsIgnoreCase("confirmed")
-                || status.equalsIgnoreCase("preparing")
-                || status.equalsIgnoreCase("awaiting_webhook_confirmation")
-                || status.equalsIgnoreCase("payment_pending")) {
-            return Color.parseColor("#FFA500");
-        } else if (status.equalsIgnoreCase("delivered")) {
-            return Color.parseColor("#2E7D32");
-        } else if (status.equalsIgnoreCase("payment_failed")
-                || status.equalsIgnoreCase("payment_cancelled")
-                || status.equalsIgnoreCase("cancelled")) {
-            return Color.parseColor("#C62828");
-        } else if (status.equalsIgnoreCase("out_for_delivery")) {
-            return Color.parseColor("#1565C0");
-        }
-
-        return Color.parseColor("#FFA500");
+    private int getStatusColor(Context context, String status) {
+        int color = R.color.bq_status_pending;
+        if ("delivered".equalsIgnoreCase(status)) color = R.color.bq_status_success;
+        else if ("payment_failed".equalsIgnoreCase(status)
+                || "payment_cancelled".equalsIgnoreCase(status)
+                || "cancelled".equalsIgnoreCase(status)) color = R.color.bq_map_error;
+        else if ("out_for_delivery".equalsIgnoreCase(status)) color = R.color.bq_map_info;
+        return ContextCompat.getColor(context, color);
     }
 }

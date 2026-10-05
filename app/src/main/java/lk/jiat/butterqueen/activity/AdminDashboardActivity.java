@@ -97,6 +97,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private void loadContent() {
         if (!authorized) return;
+        ((com.google.android.material.button.MaterialButtonToggleGroup)
+                findViewById(R.id.adminTabs)).check(showingOrders
+                ? R.id.adminOrdersTab : R.id.adminProductsTab);
         rows.removeAllViews();
         addCategoryButton.setVisibility(showingOrders ? View.GONE : View.VISIBLE);
         addProductButton.setVisibility(showingOrders ? View.GONE : View.VISIBLE);
@@ -343,7 +346,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
         cardParams.bottomMargin = dp(12);
         rows.addView(card, cardParams);
         card.setRadius(dp(18));
-        card.setCardElevation(dp(3));
+        card.setCardElevation(0);
+        card.setCardBackgroundColor(ContextCompat.getColor(this,
+                R.color.md_theme_surfaceContainerLow));
+        card.setStrokeColor(ContextCompat.getColor(this, R.color.md_theme_outlineVariant));
+        card.setStrokeWidth(dp(1));
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(14), dp(16), dp(14));
@@ -357,6 +364,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         TextView sub = new TextView(this);
         sub.setText(detail);
         sub.setTextSize(13);
+        sub.setTextColor(ContextCompat.getColor(this, R.color.md_theme_onSurfaceVariant));
         content.addView(sub);
         TextView bottom = new TextView(this);
         bottom.setText(footer);

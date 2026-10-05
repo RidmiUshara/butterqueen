@@ -31,10 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:clickable="true"
-            android:focusable="true"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -55,6 +53,38 @@
                     android:text="Follow device"
                     android:textColor="@color/md_theme_onSurfaceVariant"
                     android:textSize="14sp" />
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/settingsThemeChoices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsThemeSystem"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Device"
+                        android:textAllCaps="false" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsThemeLight"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Light"
+                        android:textAllCaps="false" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/settingsThemeDark"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Dark"
+                        android:textAllCaps="false" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -63,7 +93,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,7 +142,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -148,7 +178,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="18dp"
             app:cardCornerRadius="18dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

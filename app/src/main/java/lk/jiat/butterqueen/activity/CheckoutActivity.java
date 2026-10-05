@@ -121,6 +121,7 @@ public class CheckoutActivity extends AppCompatActivity {
         firestore = FirebaseFirestore.getInstance();
 
         initViews();
+        findViewById(R.id.checkoutBack).setOnClickListener(view -> finish());
         setupWindowInsets();
         setupAddressWatcher();
         setupActions();

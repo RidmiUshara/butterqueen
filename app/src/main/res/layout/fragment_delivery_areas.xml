@@ -17,7 +17,7 @@
         android:layout_gravity="top"
         android:layout_margin="16dp"
         app:cardCornerRadius="20dp"
-        app:cardElevation="8dp">
+        app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delivery Area — Kiribathgoda"
-                android:textColor="@android:color/black"
+                android:textColor="@color/md_theme_onSurface"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Tap anywhere on the map to calculate the charge"
-                android:textColor="#666666"
+                android:textColor="@color/md_theme_onSurfaceVariant"
                 android:textSize="13sp" />
 
             <LinearLayout
@@ -63,7 +63,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="0 - 10 km  •  Rs. 800.00"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -84,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="10 - 20 km  •  Rs. 1500.00"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -105,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="20 - 30 km  •  Rs. 2500.00"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/md_theme_onSurface"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -122,7 +122,7 @@
         android:layout_gravity="bottom"
         android:layout_margin="16dp"
         app:cardCornerRadius="22dp"
-        app:cardElevation="10dp">
+        app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,7 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No location selected yet"
-                android:textColor="#0D47A1"
+                android:textColor="@color/bq_map_info"
                 android:textSize="15sp"
                 android:textStyle="bold" />
 
@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Distance: -"
-                android:textColor="@android:color/black"
+                android:textColor="@color/md_theme_onSurface"
                 android:textSize="14sp" />
 
             <TextView
@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="Charge: -"
-                android:textColor="@android:color/black"
+                android:textColor="@color/md_theme_onSurface"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="Selected point: -"
-                android:textColor="#666666"
+                android:textColor="@color/md_theme_onSurfaceVariant"
                 android:textSize="12sp" />
 
             <LinearLayout
@@ -180,10 +180,13 @@
                     android:layout_weight="1"
                     android:text="Center Map"
                     android:textAllCaps="false"
+                    app:icon="@drawable/ic_bq_location"
+                    app:iconTint="@color/md_theme_onPrimary"
                     app:cornerRadius="16dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/clearSelectionButton"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="10dp"

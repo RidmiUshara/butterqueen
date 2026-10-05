@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="18dp"
-    app:cardElevation="4dp">
+    app:cardElevation="0dp" app:cardBackgroundColor="@color/md_theme_surfaceContainerLow" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,16 +15,20 @@
 
         <ImageView
             android:id="@+id/orderImageView"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:contentDescription="Order Image"
-            android:scaleType="centerCrop"
-            android:src="@drawable/cake_24px" />
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_bq_stepper"
+            android:contentDescription="Order"
+            android:padding="20dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_bq_orders"
+            android:tint="@color/md_theme_primary" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView

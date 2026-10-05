@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,12 +50,7 @@ public class SettingFragment extends Fragment {
     private BiometricAction biometricAction = BiometricAction.NONE;
     private char[] pendingCode;
     private String pendingUid;
-
-    private static final int[] THEME_MODES = {
-            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM,
-            AppCompatDelegate.MODE_NIGHT_NO,
-            AppCompatDelegate.MODE_NIGHT_YES
-    };
+    private boolean refreshingTheme;
 
     @Override
     public void onCreate(@Nullable Bundle state) {
@@ -95,7 +91,16 @@ public class SettingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.findViewById(R.id.settingsThemeRow).setOnClickListener(v -> showThemeDialog());
+        ((MaterialButtonToggleGroup) view.findViewById(R.id.settingsThemeChoices))
+                .addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                    if (!isChecked || refreshingTheme) return;
+                    int mode = checkedId == R.id.settingsThemeDark
+                            ? AppCompatDelegate.MODE_NIGHT_YES
+                            : checkedId == R.id.settingsThemeLight
+                            ? AppCompatDelegate.MODE_NIGHT_NO
+                            : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+                    AppSettings.setThemeMode(requireContext(), mode);
+                });
         view.findViewById(R.id.settingsBiometricSwitch).setOnClickListener(v -> toggleAppLock());
         view.findViewById(R.id.settingsVerifyBiometric).setOnClickListener(v ->
                 promptBiometric(BiometricAction.VERIFY));
@@ -134,6 +139,12 @@ public class SettingFragment extends Fragment {
                 mode == AppCompatDelegate.MODE_NIGHT_YES ? "Dark"
                         : mode == AppCompatDelegate.MODE_NIGHT_NO ? "Light"
                         : "Follow device");
+        refreshingTheme = true;
+        ((MaterialButtonToggleGroup) view.findViewById(R.id.settingsThemeChoices)).check(
+                mode == AppCompatDelegate.MODE_NIGHT_YES ? R.id.settingsThemeDark
+                        : mode == AppCompatDelegate.MODE_NIGHT_NO ? R.id.settingsThemeLight
+                        : R.id.settingsThemeSystem);
+        refreshingTheme = false;
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         boolean enabled = user != null && AppLockStore.enabled(requireContext(), user.getUid());
@@ -392,18 +403,4 @@ public class SettingFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void showThemeDialog() {
-        int current = AppSettings.themeMode(requireContext());
-        int index = current == AppCompatDelegate.MODE_NIGHT_NO ? 1
-                : current == AppCompatDelegate.MODE_NIGHT_YES ? 2 : 0;
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Appearance")
-                .setSingleChoiceItems(new String[]{"Follow device", "Light", "Dark"}, index,
-                        (dialog, which) -> {
-                            dialog.dismiss();
-                            AppSettings.setThemeMode(requireContext(), THEME_MODES[which]);
-                        })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
 }

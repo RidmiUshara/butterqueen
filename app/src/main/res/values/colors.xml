@@ -1,4 +1,8 @@
 <resources>
+    <color name="bq_map_info">#174E83</color>
+    <color name="bq_map_error">#B42318</color>
+    <color name="bq_status_pending">#875100</color>
+    <color name="bq_status_success">#2E6B37</color>
     <color name="md_theme_primary">#904A42</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_primaryContainer">#FFDAD5</color>

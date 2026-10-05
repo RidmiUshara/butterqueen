@@ -1,14 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.messageFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    android:background="@color/md_theme_background"
+    android:fillViewport="true">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
-
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Talk to ButterQueen"
+            android:textColor="@color/md_theme_onSurface"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Questions about an order or a custom cake? Reach us directly."
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/md_theme_surfaceContainerLow"
+            app:cardCornerRadius="18dp"
+            app:strokeColor="@color/md_theme_outlineVariant"
+            app:strokeWidth="1dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="We're here to help"
+                    android:textColor="@color/md_theme_onSurface"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Please include your order reference when asking about an existing order."
+                    android:textColor="@color/md_theme_onSurfaceVariant"
+                    android:textSize="14sp" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/contactCall"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Call 0763227525"
+                    app:icon="@drawable/ic_bq_phone"
+                    app:iconTint="@color/md_theme_onPrimary" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/contactEmail"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Email info@butterqueen.com"
+                    app:icon="@drawable/ic_bq_mail" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

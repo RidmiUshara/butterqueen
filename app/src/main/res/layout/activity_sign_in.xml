@@ -49,15 +49,15 @@
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="28dp"
                 android:text="Sign in to continue"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/md_theme_onSurfaceVariant"
                 android:textSize="14sp" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="@color/md_theme_surfaceContainerLow"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="4dp">
+                app:cardElevation="0dp" app:strokeColor="@color/md_theme_outlineVariant" app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
