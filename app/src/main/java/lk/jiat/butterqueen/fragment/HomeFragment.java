@@ -1,7 +1,13 @@
 package lk.jiat.butterqueen.fragment;
 
 import android.content.Intent;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -22,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import lk.jiat.butterqueen.activity.ProductDetailsActivity;
+import lk.jiat.butterqueen.data.AppSettings;
 import lk.jiat.butterqueen.adapter.CategoryAdapter;
 import lk.jiat.butterqueen.adapter.ProductAdapter;
 import lk.jiat.butterqueen.databinding.FragmentHomeBinding;
@@ -29,7 +36,7 @@ import lk.jiat.butterqueen.model.Category;
 import lk.jiat.butterqueen.model.Product;
 import lk.jiat.butterqueen.model.UnitPricing;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SensorEventListener {
 
     private FragmentHomeBinding binding;
 
@@ -41,6 +48,9 @@ public class HomeFragment extends Fragment {
     private final List<Product> filteredProducts = new ArrayList<>();
 
     private FirebaseFirestore firestore;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    private long lastShakeAt;
     private String selectedCategory = "ALL";
     private String selectedCategoryName = "ALL";
     private String selectedCategoryUnit = "";
@@ -61,6 +71,9 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         firestore = FirebaseFirestore.getInstance();
+        sensorManager = (SensorManager) requireContext().getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager == null ? null
+                : sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Bundle args = getArguments();
         if (args != null) {
             selectedCategory = args.getString("category_id", "ALL");
@@ -82,7 +95,35 @@ public class HomeFragment extends Fragment {
             loadCategories();
             loadProducts();
         }
+        if (sensorManager != null && accelerometer != null
+                && AppSettings.shakeRefresh(requireContext())) {
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        }
     }
+
+    @Override
+    public void onPause() {
+        if (sensorManager != null) sensorManager.unregisterListener(this);
+        super.onPause();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (binding == null || event.sensor.getType() != Sensor.TYPE_ACCELEROMETER
+                || !AppSettings.shakeRefresh(requireContext())) return;
+        double x = event.values[0], y = event.values[1], z = event.values[2];
+        double acceleration = Math.sqrt(x * x + y * y + z * z);
+        long now = SystemClock.elapsedRealtime();
+        if (acceleration > 20 && now - lastShakeAt >= 1800) {
+            lastShakeAt = now;
+            loadCategories();
+            loadProducts();
+            Toast.makeText(requireContext(), "Refreshing baked treats", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
     private void updateOccasionVisibility() {
         boolean show = "ALL".equals(selectedCategory)

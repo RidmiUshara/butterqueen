@@ -54,6 +54,14 @@
             android:id="@+id/nav_setting"
             android:icon="@drawable/rule_settings_24px"
             android:title="@string/side_nav_setting_title" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/chat_24px"
+            android:title="Help" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/cake_24px"
+            android:title="About" />
 
 
     </group>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_background"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="How can we help?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Ordering, payment, receipts, and app access"
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="How do I choose an amount?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Choose cakes in 0.5 kg steps. Choose cupcakes and brownies in whole pieces. The product page shows the calculated total before you add it to your cart."
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Where is my receipt?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Open Orders, tap an order, and choose Download PDF. The receipt shows the current order and payment status."
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Is my payment confirmed?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Cash on delivery remains due until collected. PayHere in this build is a sandbox; an SDK success screen does not confirm a real payment. Check the payment status shown on your order."
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Biometrics not working?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="If you enabled app lock, enter your six-digit backup code. If you forgot it, use your account password to reset the device lock while online."
+            android:textColor="@color/md_theme_onSurfaceVariant"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Need a hand with an order?"
+            android:textColor="@color/md_theme_onBackground"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/helpCall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Call 0763227525" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/helpEmail"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="18dp"
+            android:text="Email info@butterqueen.com" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

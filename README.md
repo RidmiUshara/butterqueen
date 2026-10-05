@@ -28,3 +28,11 @@ ButterQueen is a Java Android cake ordering app. The current code includes Fireb
 ## Credential cleanup
 
 The repository's original import included a Maps key in the manifest. The manifest now uses a local build placeholder. **Revoke the old key and create a restricted replacement in Google Cloud.** Removing it from a commit or branch history cannot invalidate copies already made.
+
+## Receipts, settings, and device features
+
+- In **Orders**, tap an order to open its current server-backed receipt and choose **Download PDF**. Android's document picker saves it without storage permissions. Item units, delivery fees, and payment status appear on screen and in the PDF. A pending cash-on-delivery or PayHere sandbox order receipt is **not proof of payment**.
+- **Biometric app lock** is optional per account on this device. Set a six-digit backup code, then verify with an enrolled fingerprint or face. The app locks when it leaves the foreground. The backup code works if biometrics are unavailable; a forgotten code can be reset online with the Firebase account password.
+- The backup code is stored as a salted PBKDF2 verifier with a retry cooldown. Local preferences are excluded from cloud and device backup. This is a device UI lock; Firebase Authentication and Firestore Security Rules still control backend access.
+- **Shake to refresh catalog** uses the accelerometer only while Home is visible. It is off by default and disabled on devices without an accelerometer.
+- Settings offers follow-device, light, and dark appearance. Help and About provide **0763227525** and **info@butterqueen.com** with call and email actions.

@@ -6,8 +6,6 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
-    <!--
-   <include domain="sharedpref" path="."/>
-   <exclude domain="sharedpref" path="device.xml"/>
--->
+    <!-- Local app-lock verifiers and device preferences must not leave this device. -->
+    <exclude domain="sharedpref" path="."/>
 </full-backup-content>

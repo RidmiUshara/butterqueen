@@ -27,10 +27,13 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import lk.jiat.butterqueen.AppLockGate;
 import lk.jiat.butterqueen.R;
+import lk.jiat.butterqueen.fragment.AboutFragment;
 import lk.jiat.butterqueen.fragment.CategoryFragment;
 import lk.jiat.butterqueen.fragment.DeliveryAreasFragment;
 import lk.jiat.butterqueen.fragment.HomeFragment;
+import lk.jiat.butterqueen.fragment.HelpFragment;
 import lk.jiat.butterqueen.fragment.OrdersFragment;
 import lk.jiat.butterqueen.fragment.ProfileFragment;
 import lk.jiat.butterqueen.fragment.SettingFragment;
@@ -216,7 +219,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadFragment(new messageFragment(), "Message");
 
         } else if (id == R.id.nav_setting) {
-            loadFragment(new SettingFragment(), "Setting");
+            loadFragment(new SettingFragment(), "Settings");
+
+        } else if (id == R.id.nav_help) {
+            openHelpScreen();
+
+        } else if (id == R.id.nav_about) {
+            openAboutScreen();
 
         } else if (id == R.id.nav_login) {
             Intent intent = new Intent(MainActivity.this, SignInActivity.class);
@@ -240,6 +249,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         loadFragment(fragment, category.getName());
     }
 
+    public void openHelpScreen() {
+        loadFragment(new HelpFragment(), "Help");
+    }
+
+    public void openAboutScreen() {
+        loadFragment(new AboutFragment(), "About");
+    }
+
     private void loadFragment(Fragment fragment, String title) {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -255,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setMessage("Are you sure do you want to log out?")
                 .setCancelable(true)
                 .setPositiveButton("Yes", (dialog, which) -> {
+                    AppLockGate.lockNow();
                     firebaseAuth.signOut();
 
                     Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
