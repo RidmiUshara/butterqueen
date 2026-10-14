@@ -199,7 +199,7 @@ public class AdminOverviewActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         FrameLayout bellSlot = new FrameLayout(this);
         topBar.addView(bellSlot, new LinearLayout.LayoutParams(dp(56), dp(56)));
-        notificationBell = new NotificationBellController(this, bellSlot);
+        notificationBell = new NotificationBellController(this, bellSlot, true);
         addText(root, "Bakery Studio", 31, R.color.md_theme_onBackground, true, 5);
         addText(root, "Your bakery, at a glance", 15,
                 R.color.md_theme_onSurfaceVariant, false, 4);

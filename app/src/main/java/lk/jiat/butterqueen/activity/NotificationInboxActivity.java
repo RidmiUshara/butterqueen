@@ -32,6 +32,10 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import lk.jiat.butterqueen.notification.SparkCakeNotifications;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +45,9 @@ import lk.jiat.butterqueen.R;
 public final class NotificationInboxActivity extends AppCompatActivity {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ListenerRegistration listener;
+    private ListenerRegistration cakeListener;
+    private List<DocumentSnapshot> cloudDocs = new ArrayList<>();
+    private List<SparkCakeNotifications.Notice> cakeDocs = new ArrayList<>();
     private LinearLayout content;
     private String uid;
     private boolean marking;
@@ -106,15 +113,43 @@ public final class NotificationInboxActivity extends AppCompatActivity {
                                 14, false));
                         return;
                     }
-                    if (value != null) render(value.getDocuments());
+                    if (value != null) {
+                        cloudDocs = new ArrayList<>(value.getDocuments());
+                        renderAll();
+                    }
                 });
+        // Spark-compatible Firestore-derived messages; no unsafe client writes.
+        db.collection("users").document(uid).get().addOnSuccessListener(profile -> {
+            if (!sameUser() || isFinishing() || isDestroyed()) return;
+            boolean admin = "admin".equals(profile.getString("role"));
+            cakeListener = SparkCakeNotifications.watch(uid, admin,
+                    new SparkCakeNotifications.Listener() {
+                        @Override
+                        public void onNotices(List<SparkCakeNotifications.Notice> notices) {
+                            if (!sameUser() || isFinishing() || isDestroyed()) return;
+                            cakeDocs = notices;
+                            SparkCakeNotifications.markRead(NotificationInboxActivity.this, uid, notices);
+                            renderAll();
+                        }
+                        @Override
+                        public void onError(Exception error) {
+                            if (!isFinishing() && !isDestroyed()) {
+                                Toast.makeText(NotificationInboxActivity.this,
+                                        "Cake updates unavailable. Check permissions.",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+        });
         markAllUnread();
     }
 
     @Override
     protected void onStop() {
         if (listener != null) listener.remove();
+        if (cakeListener != null) cakeListener.remove();
         listener = null;
+        cakeListener = null;
         super.onStop();
     }
 
@@ -146,15 +181,36 @@ public final class NotificationInboxActivity extends AppCompatActivity {
                 });
     }
 
-    private void render(List<DocumentSnapshot> docs) {
+    private void renderAll() {
         content.removeAllViews();
-        if (docs.isEmpty()) {
+        if (cloudDocs.isEmpty() && cakeDocs.isEmpty()) {
             content.addView(text("You're all caught up! New updates will appear here.", 15, false));
             return;
         }
-        for (DocumentSnapshot doc : docs) {
-            String title = doc.getString("title");
-            String body = doc.getString("body");
+        // Merge both sources without losing the original Firestore inbox.
+        class Entry {
+            String title, body;
+            long timestamp;
+            Runnable action;
+            Entry(String title, String body, long timestamp, Runnable action) {
+                this.title = title; this.body = body;
+                this.timestamp = timestamp; this.action = action;
+            }
+        }
+        List<Entry> entries = new ArrayList<>();
+        for (DocumentSnapshot doc : cloudDocs) {
+            Long when = doc.getLong("createdAtMillis");
+            entries.add(new Entry(doc.getString("title"), doc.getString("body"),
+                    when == null ? 0L : when, () -> openTarget(doc)));
+        }
+        for (SparkCakeNotifications.Notice notice : cakeDocs) {
+            entries.add(new Entry(notice.title, notice.body, notice.atMillis,
+                    () -> openCake(notice)));
+        }
+        Collections.sort(entries, (left, right) -> Long.compare(right.timestamp, left.timestamp));
+        for (Entry entry : entries) {
+            String title = entry.title;
+            String body = entry.body;
             MaterialCardView card = new MaterialCardView(this);
             card.setRadius(dp(18));
             card.setCardElevation(0);
@@ -175,14 +231,24 @@ public final class NotificationInboxActivity extends AppCompatActivity {
             LinearLayout.LayoutParams details = new LinearLayout.LayoutParams(-1, -2);
             details.topMargin = dp(6);
             item.addView(detail, details);
-            Long stamp = doc.getLong("createdAtMillis");
-            TextView date = text(stamp == null ? "" : new SimpleDateFormat(
+            long stamp = entry.timestamp;
+            TextView date = text(stamp <= 0 ? "" : new SimpleDateFormat(
                     "dd MMM yyyy · h:mm a", Locale.getDefault()).format(new Date(stamp)), 11, false);
             date.setTextColor(color(R.color.md_theme_onSurfaceVariant));
             LinearLayout.LayoutParams dateParams = new LinearLayout.LayoutParams(-1, -2);
             dateParams.topMargin = dp(8);
             item.addView(date, dateParams);
-            card.setOnClickListener(v -> openTarget(doc));
+            card.setOnClickListener(v -> entry.action.run());
+        }
+    }
+
+    private void openCake(SparkCakeNotifications.Notice notice) {
+        if (!sameUser()) { finish(); return; }
+        // Access to admin management remains protected by AdminAccess and rules.
+        if ("admin_new".equals(notice.type)) {
+            startActivity(new Intent(this, AdminCustomCakeRequestsActivity.class));
+        } else {
+            startActivity(new Intent(this, MyCustomCakeRequestsActivity.class));
         }
     }
 

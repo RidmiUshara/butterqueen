@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import lk.jiat.butterqueen.R;
+import lk.jiat.butterqueen.notification.CustomCakeLocalAlert;
 
 public class CustomCakeActivity extends AppCompatActivity {
     // Demo on Spark: users can preview/select a photo, but it cannot be uploaded yet.
@@ -194,6 +195,11 @@ public class CustomCakeActivity extends AppCompatActivity {
         request.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
         FirebaseFirestore.getInstance().collection("customCakeRequests").add(request)
                 .addOnSuccessListener(doc -> {
+                    // No Cloud Functions on Spark: confirm submission locally.
+                    // The saved Firestore request also appears in both roles' bell feeds.
+                    CustomCakeLocalAlert.show(this, "customer_cake_" + doc.getId(),
+                            "Custom cake request sent",
+                            "The bakery received your request and will review it.");
                     Toast.makeText(this, "Request sent! The bakery will review it.", Toast.LENGTH_LONG).show();
                     finish();
                 }).addOnFailureListener(error -> showFailure("Could not submit request: " + error.getMessage()));
