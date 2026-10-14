@@ -53,8 +53,9 @@ public final class ButterQueenMessagingService extends FirebaseMessagingService 
         }
         Intent intent = new Intent(this, NotificationInboxActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        int id = (message.getMessageId() == null
-                ? System.nanoTime() : message.getMessageId()).hashCode();
+        String messageKey = message.getMessageId() == null
+                ? String.valueOf(System.nanoTime()) : message.getMessageId();
+        int id = messageKey.hashCode();
         PendingIntent open = PendingIntent.getActivity(this, id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         String title = data.getOrDefault("title", "Butter Queen");
