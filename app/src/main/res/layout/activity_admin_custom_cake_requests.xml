@@ -13,8 +13,39 @@
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_bq_back"
         app:navigationIconTint="@color/md_theme_onSurface"
-        app:title="Custom Cake Requests" />
+        app:title="Custom Requests • Inbox"
+        app:titleTextColor="@color/md_theme_onSurface" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="CUSTOM REQUEST INBOX"
+        android:textColor="@color/md_theme_primary"
+        android:textSize="11sp"
+        android:letterSpacing="0.15"
+        android:textStyle="bold" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_marginTop="6dp"
+        android:text="Personal cake designs"
+        android:textColor="@color/md_theme_onBackground"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_marginTop="5dp"
+        android:text="Review customer ideas and manage their progress"
+        android:textSize="13sp"
+        android:textColor="@color/md_theme_onSurfaceVariant" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/adminCustomRequestsRefresh"
         style="@style/Widget.Material3.Button.OutlinedButton"
@@ -23,7 +54,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="6dp"
-        android:text="Refresh requests"
+        android:text="↻ Refresh requests"
         android:textAllCaps="false" />
 
     <TextView
