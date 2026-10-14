@@ -32,6 +32,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -270,8 +271,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         headerEmail.setText(email != null ? email : "");
 
                         if (imageUrl != null && !imageUrl.isEmpty()) {
+                            Long photoVersion = documentSnapshot.getLong("profileImageUpdatedAtMillis");
                             Glide.with(this)
                                     .load(imageUrl)
+                                    .signature(new ObjectKey(photoVersion == null ? 0L : photoVersion))
                                     .placeholder(R.drawable.account_circle_24px)
                                     .error(R.drawable.account_circle_24px)
                                     .into(headerAvatar);
