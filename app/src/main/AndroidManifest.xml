@@ -31,6 +31,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/profile_camera_paths" />
         </provider>
+        <activity android:name=".activity.NotificationInboxActivity" android:exported="false" />
         <activity android:name=".activity.AdminOverviewActivity" android:exported="false" />
         <activity
             android:name=".activity.AdminDashboardActivity"

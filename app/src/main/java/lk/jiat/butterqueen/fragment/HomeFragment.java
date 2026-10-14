@@ -1,6 +1,7 @@
 package lk.jiat.butterqueen.fragment;
 
 import android.content.Intent;
+import lk.jiat.butterqueen.notification.NotificationBellController;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -39,6 +40,8 @@ import lk.jiat.butterqueen.model.Product;
 import lk.jiat.butterqueen.model.UnitPricing;
 
 public class HomeFragment extends Fragment implements SensorEventListener {
+    private NotificationBellController notificationBell;
+
 
     private FragmentHomeBinding binding;
 
@@ -65,6 +68,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+        notificationBell = new NotificationBellController(requireActivity(), binding.customerNotificationBellHost);
         return binding.getRoot();
     }
 
@@ -312,6 +316,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
 
     @Override
     public void onDestroyView() {
+        if (notificationBell != null) {
+            notificationBell.close();
+            notificationBell = null;
+        }
         super.onDestroyView();
         binding = null;
     }

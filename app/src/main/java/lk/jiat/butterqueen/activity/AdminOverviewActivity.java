@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import lk.jiat.butterqueen.fragment.AdminProfileFragment;
+import lk.jiat.butterqueen.notification.NotificationBellController;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,7 @@ public class AdminOverviewActivity extends AppCompatActivity {
     private FrameLayout adminProfileHost;
     private BottomNavigationView adminNav;
     private boolean profileTabSelected;
+    private NotificationBellController notificationBell;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -115,6 +117,12 @@ public class AdminOverviewActivity extends AppCompatActivity {
                     .replace(R.id.contentFrame, new AdminProfileFragment())
                     .commit();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (notificationBell != null) notificationBell.close();
+        super.onDestroy();
     }
 
     private void refreshAdmin() {
@@ -181,8 +189,15 @@ public class AdminOverviewActivity extends AppCompatActivity {
             }
             return false;
         });
-        addText(root, "B U T T E R   Q U E E N   /   A D M I N",
-                11, R.color.md_theme_primary, true, 15);
+        LinearLayout topBar = row(root, 4);
+        topBar.setGravity(Gravity.CENTER_VERTICAL);
+        TextView adminCaption = addText(topBar, "B U T T E R   Q U E E N   /   A D M I N",
+                11, R.color.md_theme_primary, true, 0);
+        adminCaption.setLayoutParams(new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        FrameLayout bellSlot = new FrameLayout(this);
+        topBar.addView(bellSlot, new LinearLayout.LayoutParams(dp(56), dp(56)));
+        notificationBell = new NotificationBellController(this, bellSlot);
         addText(root, "Bakery Studio", 31, R.color.md_theme_onBackground, true, 5);
         addText(root, "Your bakery, at a glance", 15,
                 R.color.md_theme_onSurfaceVariant, false, 4);
