@@ -256,8 +256,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             fullName = "ButterQueen User";
                         }
 
-                        navigationView.getMenu().findItem(R.id.nav_admin).setVisible(
-                                "admin".equals(documentSnapshot.getString("role")));
+                        if ("admin".equals(documentSnapshot.getString("role"))) {
+                            // Old customer notification routes cannot leave an admin in customer UI.
+                            Intent destination = new Intent(this, AdminOverviewActivity.class);
+                            destination.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                                    | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(destination);
+                            finish();
+                            return;
+                        }
+                        navigationView.getMenu().findItem(R.id.nav_admin).setVisible(false);
                         headerName.setText(fullName);
                         headerEmail.setText(email != null ? email : "");
 
