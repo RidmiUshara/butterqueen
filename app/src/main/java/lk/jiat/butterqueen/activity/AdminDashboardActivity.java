@@ -243,6 +243,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         String paymentStatus = order.getString("paymentStatus");
         boolean awaitingPayment = "payhere".equals(paymentMethod)
                 && !"paid".equals(paymentStatus);
+        // Never mark an unverified PayHere payment as delivered.
         String[] statuses = awaitingPayment
                 ? new String[]{"payment_pending", "cancelled"}
                 : new String[]{"placed", "preparing", "out_for_delivery",
@@ -251,14 +252,41 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 ? new String[]{"Payment verification pending", "Cancelled"}
                 : new String[]{"Placed", "Preparing", "Out for delivery",
                         "Delivered", "Cancelled"};
+
         new AlertDialog.Builder(this)
                 .setTitle("Update order status")
-                .setItems(labels, (dialog, which) -> firestore.collection("orders")
-                        .document(order.getId()).update("orderStatus", statuses[which])
-                        .addOnSuccessListener(unused -> loadContent())
-                        .addOnFailureListener(error -> Toast.makeText(this,
-                                "Update failed: " + error.getMessage(), Toast.LENGTH_LONG).show()))
-                .show();
+                .setItems(labels, (dialog, which) -> {
+                    String chosen = statuses[which];
+                    if (chosen.equals(order.getString("orderStatus"))) return;
+                    new AlertDialog.Builder(this)
+                            .setTitle("Confirm status update")
+                            .setMessage("Change order #" + order.getId().substring(
+                                    0, Math.min(8, order.getId().length()))
+                                    + " to " + labels[which] + "?")
+                            .setNegativeButton("Cancel", null)
+                            .setPositiveButton("Update", (confirm, button) -> {
+                                AdminAccess.verify(allowed -> {
+                                    if (isFinishing() || isDestroyed()) return;
+                                    if (!allowed) {
+                                        Toast.makeText(this, "Admin access required",
+                                                Toast.LENGTH_LONG).show();
+                                        finish();
+                                        return;
+                                    }
+                                    firestore.collection("orders").document(order.getId())
+                                            .update("orderStatus", chosen)
+                                            .addOnSuccessListener(unused -> {
+                                                if (isFinishing() || isDestroyed()) return;
+                                                Toast.makeText(this, "Order status updated",
+                                                        Toast.LENGTH_SHORT).show();
+                                                if (showingOrders) loadContent();
+                                            })
+                                            .addOnFailureListener(error -> Toast.makeText(this,
+                                                    "Update failed: " + error.getMessage(),
+                                                    Toast.LENGTH_LONG).show());
+                                });
+                            }).show();
+                }).show();
     }
 
     private void showCategoryDialog() {
