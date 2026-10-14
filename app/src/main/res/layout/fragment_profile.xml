@@ -63,6 +63,16 @@
                     android:text="Change Photo"
                     android:textAllCaps="false"
                     app:cornerRadius="18dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="Photo saved on this device only — no cloud upload."
+                    android:textColor="@color/md_theme_onPrimaryContainer"
+                    android:alpha="0.75"
+                    android:textSize="12sp" />
+
 
             </LinearLayout>
 
