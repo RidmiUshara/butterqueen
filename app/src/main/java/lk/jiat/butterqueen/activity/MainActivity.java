@@ -31,8 +31,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -41,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import lk.jiat.butterqueen.AppLockGate;
+import lk.jiat.butterqueen.data.LocalProfilePhotoStore;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.fragment.AboutFragment;
 import lk.jiat.butterqueen.fragment.CategoryFragment;
@@ -199,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
+        refreshLocalAvatar();
         if (navigationView != null) {
             updateAuthMenu();
             Fragment current = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
@@ -220,6 +220,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             headerName = headerView.findViewById(R.id.headerName);
             headerEmail = headerView.findViewById(R.id.headerEmail);
         }
+    }
+
+    /** Use the same app-private photo as Customer Profile, including after an edit. */
+    public void refreshLocalAvatar() {
+        if (headerAvatar == null) return;
+        String uid = firebaseAuth == null || firebaseAuth.getCurrentUser() == null
+                ? null : firebaseAuth.getCurrentUser().getUid();
+        LocalProfilePhotoStore.display(this, uid, headerAvatar);
     }
 
     private void listenToDrawerHeaderUser() {
@@ -248,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         String firstName = documentSnapshot.getString("firstName");
                         String lastName = documentSnapshot.getString("lastName");
                         String email = documentSnapshot.getString("email");
-                        String imageUrl = documentSnapshot.getString("profileImageUrl");
 
                         String fullName = ((firstName != null ? firstName : "") + " " +
                                 (lastName != null ? lastName : "")).trim();
@@ -270,17 +277,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         headerName.setText(fullName);
                         headerEmail.setText(email != null ? email : "");
 
-                        if (imageUrl != null && !imageUrl.isEmpty()) {
-                            Long photoVersion = documentSnapshot.getLong("profileImageUpdatedAtMillis");
-                            Glide.with(this)
-                                    .load(imageUrl)
-                                    .signature(new ObjectKey(photoVersion == null ? 0L : photoVersion))
-                                    .placeholder(R.drawable.account_circle_24px)
-                                    .error(R.drawable.account_circle_24px)
-                                    .into(headerAvatar);
-                        } else {
-                            headerAvatar.setImageResource(R.drawable.account_circle_24px);
-                        }
+                        refreshLocalAvatar();
                     }
                 });
     }
