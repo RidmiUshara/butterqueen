@@ -190,49 +190,6 @@
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
-            <!-- Camera/gallery preview only; not attached to orders in this stage. -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Cake Design Reference (Preview)"
-                android:textColor="@color/md_theme_onBackground"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Take a photo or choose an image to preview a cake idea. This photo is not sent with your order yet."
-                android:textColor="@color/md_theme_onBackground"
-                android:textSize="13sp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/takeReferencePhotoButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Take Photo"
-                android:textAllCaps="false" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chooseReferencePhotoButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Choose from Gallery"
-                android:textAllCaps="false" />
-
-            <ImageView
-                android:id="@+id/referencePhotoPreview"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="12dp"
-                android:contentDescription="Selected cake reference photo preview"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addToCartButton"
                 android:layout_width="match_parent"

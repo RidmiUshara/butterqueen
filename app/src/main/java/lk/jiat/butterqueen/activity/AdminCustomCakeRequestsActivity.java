@@ -10,6 +10,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,6 +48,7 @@ public class AdminCustomCakeRequestsActivity extends AppCompatActivity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_admin_custom_cake_requests);
+        applyWindowInsets();
         rows = findViewById(R.id.adminCustomRequestsRows);
         summary = findViewById(R.id.adminCustomRequestsStatus);
         findViewById(R.id.adminCustomRequestsBack).setOnClickListener(v -> finish());
@@ -61,6 +65,17 @@ public class AdminCustomCakeRequestsActivity extends AppCompatActivity {
             authorized = true;
             loadRequests();
         });
+    }
+
+    private void applyWindowInsets() {
+        // Keep the toolbar clear of the clock on Android 15+ edge-to-edge devices.
+        View root = findViewById(R.id.adminCustomRequestsRoot);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
     }
 
     private void loadRequests() {

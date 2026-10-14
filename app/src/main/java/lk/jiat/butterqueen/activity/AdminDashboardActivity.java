@@ -14,6 +14,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.DocumentReference;
@@ -49,6 +52,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_admin_dashboard);
+        applyWindowInsets();
         firestore = FirebaseFirestore.getInstance();
         rows = findViewById(R.id.adminRows);
         statusText = findViewById(R.id.adminStatusText);
@@ -83,6 +87,17 @@ public class AdminDashboardActivity extends AppCompatActivity {
             authorized = true;
             loadContent();
         });
+    }
+
+    private void applyWindowInsets() {
+        // Keep the toolbar clear of the clock on Android 15+ edge-to-edge devices.
+        View root = findViewById(R.id.adminDashboardRoot);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
     }
 
     @Override
