@@ -1,6 +1,7 @@
 package lk.jiat.butterqueen.activity;
 
 import android.content.Context;
+import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -39,6 +40,7 @@ import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.data.AdminAccess;
 import lk.jiat.butterqueen.data.OrderReceipt;
 import lk.jiat.butterqueen.data.OrderReceiptPdf;
+import lk.jiat.butterqueen.data.OrderSummaryJson;
 import lk.jiat.butterqueen.model.OrderItem;
 import lk.jiat.butterqueen.model.UnitPricing;
 
@@ -88,6 +90,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         findViewById(R.id.receiptBack).setOnClickListener(v -> finish());
         findViewById(R.id.receiptDownload).setOnClickListener(v -> createPdf.launch(fileName()));
         findViewById(R.id.receiptShare).setOnClickListener(v -> shareLatest());
+        findViewById(R.id.receiptCopyJson).setOnClickListener(v -> copyJsonSummary());
         if (adminView) {
             AdminAccess.verify(allowed -> {
                 if (isFinishing() || isDestroyed()) return;
@@ -241,6 +244,29 @@ public final class OrderReceiptActivity extends AppCompatActivity {
      * customer explicitly choose a target (including Quick Share if installed).
      * No storage or Bluetooth runtime permissions are required for Sharesheet.
      */
+    /** Explicit JSON encoding of a receipt summary without customer contact details. */
+    private void copyJsonSummary() {
+        if (!loaded || loading || !sameAccount()) return;
+        setLoading(true);
+        fetch(receipt -> {
+            if (isFinishing() || isDestroyed()) return;
+            try {
+                String json = OrderSummaryJson.encode(receipt);
+                ClipboardManager clipboard = (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard == null) throw new IllegalStateException("Clipboard unavailable");
+                clipboard.setPrimaryClip(ClipData.newPlainText(
+                        "ButterQueen order summary", json));
+                Toast.makeText(this, "JSON summary copied (no address or phone)",
+                        Toast.LENGTH_LONG).show();
+            } catch (RuntimeException error) {
+                Toast.makeText(this, "Could not copy JSON summary", Toast.LENGTH_LONG).show();
+            } finally {
+                setLoading(false);
+            }
+        });
+    }
+
     private void shareLatest() {
         if (!loaded || loading || !sameAccount()) return;
         setLoading(true);
@@ -312,6 +338,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         loading = value;
         findViewById(R.id.receiptDownload).setEnabled(!value && loaded);
         findViewById(R.id.receiptShare).setEnabled(!value && loaded);
+        findViewById(R.id.receiptCopyJson).setEnabled(!value && loaded);
     }
 
     private void fail() {
