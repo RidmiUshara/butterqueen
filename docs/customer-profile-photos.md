@@ -1,54 +1,57 @@
-# Customer profile photos — Firebase Storage setup
+# Customer profile photos — local storage only
 
-The customer Profile screen supports both **Camera** (full-resolution photo via FileProvider) and
-**Gallery** (Android image picker). Images are resized to max 768 px and uploaded as JPEG.
+Customer Profile -> **Change Photo** -> **Take photo with camera** or
+**Choose from gallery**.
 
-## Requirements
+The app takes a full-resolution camera photo using the existing FileProvider, or
+copies the photo from the Android system gallery picker. It normalizes the selected
+image to an approximately 768 px JPEG and saves it in the Android app's private
+internal storage:
 
-1. Firebase project `butter-queen` must have **Cloud Storage for Firebase** enabled.
-2. Firebase Storage requires **Blaze (pay-as-you-go)** even for default buckets, as of 2026.
-   This does not automatically mean a bill, but billing must be enabled and usage can be charged.
-   Do not enable billing without the project owner's permission. Add budget alerts if upgrading.
-3. The application's `app/google-services.json` must match project `butter-queen`
-   and contain its bucket configuration. Never commit this file or private credentials.
-4. Firestore security rules must allow the signed-in user to update **only their own**
-   document `users/{uid}`; the app updates `profileImageUrl` and `profileImageUpdatedAtMillis`.
-   Profile image updates do **not** need to change the user role.
-
-## Storage Rules (merge into existing rules)
-
-Add this match inside `service firebase.storage { match /b/{bucket}/o { ... } }`:
-
-```firebase
-match /profile_images/{fileName} {
-  // The app stores images exactly as "{auth.uid}.jpg" and converts them to JPEG.
-  allow read: if request.auth != null
-              && fileName == request.auth.uid + '.jpg';
-  allow write: if request.auth != null
-               && fileName == request.auth.uid + '.jpg'
-               && request.resource.size < 2 * 1024 * 1024
-               && request.resource.contentType == 'image/jpeg';
-}
+```text
+<app-internal-files>/profile_photos/<firebase-auth-uid>.jpg
 ```
 
-Important: do **not** replace existing Storage Rules with the fragment alone.
-Do **not** use a public wildcard such as `allow read, write: if true;`.
-Publishing and testing live Storage Rules requires console access and is not performed by GitHub commits.
+The camera's temporary image is under `<app-cache>/profile_camera` and is removed
+after processing. The gallery photo is **copied** into the app; the original is
+not modified or moved.
 
-## Test
+**No Firebase Storage, Firestore photo URL, billing upgrade, Storage Rules, or
+image upload is needed.** Firebase Authentication is used only to separate each
+customer's local file by account UID; existing Firestore-backed personal details
+and order management are unchanged.
 
-- Sign in as customer → Profile → Change Photo → Gallery → select photo.
-- Repeat with **Take photo with camera**; capture and confirm.
-- Wait for "Profile photo saved"; leave Profile and return.
-- Reopen app; image should load from the Firestore `profileImageUrl`.
-- Check navigation drawer avatar changes after photo upload.
-- Confirm another customer account cannot overwrite a different user's profile photo.
+The customer Profile and the customer navigation drawer both display this local
+file. Saving a new photo replaces the previous file. The drawer refreshes
+immediately, and both screens load the same saved photo when the app reopens.
 
-If the image cannot be uploaded and the project is on **Spark**, Firebase will return
-billing/authorization errors (often HTTP 402 or 403). This cannot be fixed by Android code
-alone. For a no-billing viva demo, demonstrate the camera chooser/preview separately
-and describe Cloud Storage upload as dependent on Firebase billing and rules.
+## Limitations
 
-Firebase guidance:
-https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024
-https://firebase.google.com/docs/storage/security/
+- Photo remains on **this phone/emulator only**. Signing in on another device
+  does not transfer it.
+- Android **Clear storage** or **Uninstall** deletes the app-private file.
+- Logging out **does not delete** the image, so the same account can still see
+  its photo after signing back in on the same device.
+- A different account on the same device gets a separate UID-based file.
+- Deleting the Firebase account through the Profile screen also deletes that
+  account's local photo if Firebase account deletion succeeds.
+- Prior `profileImageUrl` values may remain in existing Firestore user
+  documents from an old cloud-photo implementation, but this version of the app
+  no longer loads or updates them.
+
+## Test steps
+
+1. Sign in to a **customer** account.
+2. Go to Profile -> Change Photo -> Choose from gallery. Pick an image.
+3. Confirm **Profile photo saved on this device**.
+4. Open the navigation drawer: both avatars should now match.
+5. Force-close and reopen the app. The saved photo should remain.
+6. Profile -> Change Photo -> Take photo with camera. Capture and confirm.
+7. Confirm the previous local photo is replaced and still visible after restart.
+8. Try the app without internet: photo selection and display should still work
+   (profile details may need their existing Firestore cache).
+
+No additional gallery or camera runtime permissions are needed because image
+selection/capture uses Android system activity-result contracts and FileProvider.
+Android build CI tests compilation only; camera and gallery actions must be tested
+on a real device or emulator.
