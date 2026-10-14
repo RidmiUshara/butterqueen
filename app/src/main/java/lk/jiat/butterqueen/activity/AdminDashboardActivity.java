@@ -52,6 +52,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_admin_dashboard);
+        showingOrders = getIntent().getBooleanExtra("open_orders", false);
         applyWindowInsets();
         firestore = FirebaseFirestore.getInstance();
         rows = findViewById(R.id.adminRows);

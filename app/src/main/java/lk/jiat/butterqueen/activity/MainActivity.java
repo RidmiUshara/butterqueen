@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadFragment(new OrdersFragment(), "Orders");
 
         } else if (id == R.id.nav_admin) {
-            startActivity(new Intent(this, AdminDashboardActivity.class));
+            startActivity(new Intent(this, AdminOverviewActivity.class));
 
         } else if (id == R.id.nav_category) {
             loadFragment(new CategoryFragment(), "Category");
