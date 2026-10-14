@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="220dp"
+    android:layout_height="wrap_content"
+    android:minHeight="230dp"
     android:orientation="vertical"
     android:gravity="bottom"
     android:padding="20dp"
@@ -16,19 +18,28 @@
         android:textSize="13sp"
         android:alpha="0.85" />
 
-    <ImageView
-        android:id="@+id/headerAvatar"
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="82dp"
         android:layout_height="82dp"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="14dp"
-        android:background="@drawable/bg_nav_avatar"
-        android:scaleType="centerCrop"
-        android:src="@drawable/account_circle_24px"
-        android:contentDescription="Profile Image" />
+        app:cardCornerRadius="41dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/md_theme_outlineVariant"
+        app:strokeWidth="1dp">
+        <ImageView
+            android:id="@+id/headerAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Profile image"
+            android:src="@drawable/account_circle_24px" />
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/headerName"
+        android:maxLines="2"
+        android:ellipsize="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ButterQueen User"

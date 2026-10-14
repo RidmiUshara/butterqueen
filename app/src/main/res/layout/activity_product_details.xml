@@ -14,7 +14,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="320dp">
+            android:layout_height="270dp">
 
             <ImageView
                 android:id="@+id/detailsProductImageView"
@@ -159,7 +159,7 @@
                         android:tint="@color/bq_stepper_tint" />
                     <TextView
                         android:id="@+id/quantityTextView"
-                        android:layout_width="72dp"
+                        android:layout_width="56dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="8dp"

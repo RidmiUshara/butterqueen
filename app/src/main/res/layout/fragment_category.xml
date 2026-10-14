@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="@color/md_theme_background"
-    android:padding="16dp">
+    android:padding="18dp">
 
     <TextView
         android:id="@+id/categoryTitleTextView"

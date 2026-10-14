@@ -31,6 +31,8 @@
 
         <EditText
             android:id="@+id/searchEditText"
+            android:singleLine="true"
+            android:imeOptions="actionSearch"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="16dp"
@@ -48,7 +50,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="205dp"
+            android:layout_height="220dp"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp">
