@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import lk.jiat.butterqueen.fragment.AdminProfileFragment;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,11 +69,18 @@ public class AdminOverviewActivity extends AppCompatActivity {
     private DonutView donut;
     private boolean authorized;
     private boolean loading;
+    private NestedScrollView dashboardScroll;
+    private FrameLayout adminProfileHost;
+    private BottomNavigationView adminNav;
+    private boolean profileTabSelected;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         buildScreen();
+        if (state != null && state.getBoolean("admin_profile_tab")) {
+            adminNav.setSelectedItemId(R.id.bottom_profile);
+        }
         refreshAdmin();
     }
 
@@ -78,6 +88,33 @@ public class AdminOverviewActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (authorized) refreshAdmin();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        state.putBoolean("admin_profile_tab", profileTabSelected);
+        super.onSaveInstanceState(state);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (profileTabSelected) {
+            adminNav.setSelectedItemId(R.id.bottom_home);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void displayTab(boolean showProfile) {
+        profileTabSelected = showProfile;
+        dashboardScroll.setVisibility(showProfile ? View.GONE : View.VISIBLE);
+        adminProfileHost.setVisibility(showProfile ? View.VISIBLE : View.GONE);
+        if (showProfile && getSupportFragmentManager()
+                .findFragmentById(R.id.contentFrame) == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.contentFrame, new AdminProfileFragment())
+                    .commit();
+        }
     }
 
     private void refreshAdmin() {
@@ -102,18 +139,48 @@ public class AdminOverviewActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(8), dp(20), dp(26));
         scroll.addView(root);
-        setContentView(scroll);
-        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+        dashboardScroll = scroll;
+
+        LinearLayout shell = new LinearLayout(this);
+        shell.setOrientation(LinearLayout.VERTICAL);
+        shell.setBackgroundColor(color(R.color.md_theme_background));
+
+        FrameLayout content = new FrameLayout(this);
+        shell.addView(content, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        content.addView(dashboardScroll, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        adminProfileHost = new FrameLayout(this);
+        adminProfileHost.setId(R.id.contentFrame);
+        adminProfileHost.setVisibility(View.GONE);
+        content.addView(adminProfileHost, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        adminNav = new BottomNavigationView(this);
+        adminNav.getMenu().add(0, R.id.bottom_home, 0, "Home").setIcon(R.drawable.ic_bq_home);
+        adminNav.getMenu().add(0, R.id.bottom_profile, 1, "Profile").setIcon(R.drawable.ic_bq_profile);
+        adminNav.setLabelVisibilityMode(
+                com.google.android.material.navigation.NavigationBarView.LABEL_VISIBILITY_LABELED);
+        adminNav.setBackgroundColor(color(R.color.md_theme_surfaceContainerLow));
+        adminNav.setElevation(dp(5));
+        shell.addView(adminNav, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        setContentView(shell);
+        ViewCompat.setOnApplyWindowInsetsListener(shell, (view, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(dp(20) + bars.left, dp(8) + bars.top,
-                    dp(20) + bars.right, dp(26) + bars.bottom);
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return insets;
         });
-        ViewCompat.requestApplyInsets(root);
-
-        MaterialButton back = button("‹  Back", false);
-        root.addView(back, new LinearLayout.LayoutParams(dp(116), dp(46)));
-        back.setOnClickListener(v -> finish());
+        ViewCompat.requestApplyInsets(shell);
+        adminNav.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.bottom_home || item.getItemId() == R.id.bottom_profile) {
+                displayTab(item.getItemId() == R.id.bottom_profile);
+                return true;
+            }
+            return false;
+        });
         addText(root, "B U T T E R   Q U E E N   /   A D M I N",
                 11, R.color.md_theme_primary, true, 15);
         addText(root, "Bakery Studio", 31, R.color.md_theme_onBackground, true, 5);
