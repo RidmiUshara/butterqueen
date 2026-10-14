@@ -40,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import lk.jiat.butterqueen.AppLockGate;
 import lk.jiat.butterqueen.data.LocalProfilePhotoStore;
+import lk.jiat.butterqueen.notification.PushTokenRegistrar;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.fragment.AboutFragment;
 import lk.jiat.butterqueen.fragment.CategoryFragment;
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        PushTokenRegistrar.register(this);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
@@ -413,6 +415,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(true)
                 .setPositiveButton("Yes", (dialog, which) -> {
                     AppLockGate.lockNow();
+                    PushTokenRegistrar.unregister(this);
                     firebaseAuth.signOut();
 
                     Toast.makeText(MainActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();

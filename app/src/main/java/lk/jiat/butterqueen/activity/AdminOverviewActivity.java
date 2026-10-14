@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import lk.jiat.butterqueen.fragment.AdminProfileFragment;
 import lk.jiat.butterqueen.notification.NotificationBellController;
+import lk.jiat.butterqueen.notification.PushTokenRegistrar;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -134,6 +135,7 @@ public class AdminOverviewActivity extends AppCompatActivity {
                 finish();
             } else {
                 authorized = true;
+                PushTokenRegistrar.register(this);
                 loadOverview();
             }
         });

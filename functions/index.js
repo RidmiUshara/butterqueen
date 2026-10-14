@@ -48,6 +48,7 @@ async function push(uid, event) {
         body: event.body,
         type: event.type,
         targetId: event.targetId,
+        recipientUid: uid,
       },
       android: {priority: "high"},
     });

@@ -31,6 +31,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/profile_camera_paths" />
         </provider>
+        <service
+            android:name=".notification.ButterQueenMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <activity android:name=".activity.NotificationInboxActivity" android:exported="false" />
         <activity android:name=".activity.AdminOverviewActivity" android:exported="false" />
         <activity

@@ -26,6 +26,7 @@ import java.util.Map;
 import lk.jiat.butterqueen.AppLockGate;
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.activity.SignInActivity;
+import lk.jiat.butterqueen.notification.PushTokenRegistrar;
 
 /** Separate admin profile; customer profiles continue to use ProfileFragment. */
 public final class AdminProfileFragment extends Fragment {
@@ -142,6 +143,7 @@ public final class AdminProfileFragment extends Fragment {
     private void signOut() {
         if (!isAdded()) return;
         AppLockGate.lockNow();
+        PushTokenRegistrar.unregister(requireContext());
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(requireContext(), SignInActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

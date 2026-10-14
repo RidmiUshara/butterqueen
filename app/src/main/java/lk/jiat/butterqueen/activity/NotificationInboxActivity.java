@@ -1,6 +1,11 @@
 package lk.jiat.butterqueen.activity;
 
 import android.content.Intent;
+import android.Manifest;
+import android.os.Build;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -49,6 +54,12 @@ public final class NotificationInboxActivity extends AppCompatActivity {
             return;
         }
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // Ask only after the user deliberately opens Notifications.
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, 721);
+        }
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(color(R.color.md_theme_background));
