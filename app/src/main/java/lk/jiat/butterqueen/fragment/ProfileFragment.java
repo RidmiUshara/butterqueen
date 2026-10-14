@@ -3,6 +3,9 @@ package lk.jiat.butterqueen.fragment;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -18,18 +21,27 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.activity.SignInActivity;
@@ -50,17 +62,50 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseStorage firebaseStorage;
+    private ListenerRegistration profileRegistration;
+    private final ExecutorService photoWorker = Executors.newSingleThreadExecutor();
+    private File cameraFile;
+    private boolean photoUploading;
 
     private final ActivityResultLauncher<String> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri != null) {
-                    uploadProfileImage(uri);
+                if (uri != null && isAdded()) uploadProfileImage(uri);
+            });
+
+    // TakePicture stores the full image in the app's private cache, not a small thumbnail.
+    // No CAMERA or gallery/storage permission is needed when using the system apps.
+    private final ActivityResultLauncher<Uri> cameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), saved -> {
+                if (!isAdded()) return;
+                File captured = cameraFile;
+                if (saved && captured != null && captured.isFile()) {
+                    uploadProfileImage(Uri.fromFile(captured));
                 } else {
-                    Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show();
+                    removeCameraFile();
+                    Toast.makeText(requireContext(), "Camera photo cancelled",
+                            Toast.LENGTH_SHORT).show();
                 }
             });
 
     public ProfileFragment() {
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle state) {
+        super.onCreate(state);
+        if (state != null) {
+            String fileName = state.getString("profileCameraFile");
+            if (fileName != null) {
+                cameraFile = new File(new File(requireContext().getCacheDir(),
+                        "profile_camera"), fileName);
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        if (cameraFile != null) outState.putString("profileCameraFile", cameraFile.getName());
+        super.onSaveInstanceState(outState);
     }
 
     @Nullable
@@ -89,7 +134,7 @@ public class ProfileFragment extends Fragment {
 
         birthdayProfileEditText.setOnClickListener(v -> showDatePicker());
 
-        changePhotoButton.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
+        changePhotoButton.setOnClickListener(v -> choosePhotoSource());
 
         updateProfileButton.setOnClickListener(v -> updateProfile());
 
@@ -105,7 +150,8 @@ public class ProfileFragment extends Fragment {
 
         String userId = firebaseAuth.getCurrentUser().getUid();
 
-        firebaseFirestore.collection("users")
+        if (profileRegistration != null) profileRegistration.remove();
+        profileRegistration = firebaseFirestore.collection("users")
                 .document(userId)
                 .addSnapshotListener((documentSnapshot, error) -> {
                     if (!isAdded()) {
@@ -140,8 +186,10 @@ public class ProfileFragment extends Fragment {
                         birthdayProfileEditText.setText(birthday != null ? birthday : "");
 
                         if (imageUrl != null && !imageUrl.isEmpty()) {
+                            Long imageRevision = documentSnapshot.getLong("profileImageUpdatedAtMillis");
                             Glide.with(this)
                                     .load(imageUrl)
+                                    .signature(new ObjectKey(imageRevision == null ? 0L : imageRevision))
                                     .placeholder(R.drawable.account_circle_24px)
                                     .error(R.drawable.account_circle_24px)
                                     .into(profileImageView);
@@ -205,48 +253,169 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    private void choosePhotoSource() {
+        if (photoUploading) return;
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Change profile photo")
+                .setItems(new String[]{"Take photo with camera", "Choose from gallery"},
+                        (dialog, option) -> {
+                            if (option == 0) takeCameraPhoto();
+                            else imagePickerLauncher.launch("image/*");
+                        })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void takeCameraPhoto() {
+        if (!isAdded() || photoUploading) return;
+        try {
+            File dir = new File(requireContext().getCacheDir(), "profile_camera");
+            if (!dir.exists() && !dir.mkdirs()) throw new IOException("Cannot create photo folder");
+            removeCameraFile();
+            cameraFile = File.createTempFile("profile_", ".jpg", dir);
+            Uri destination = FileProvider.getUriForFile(requireContext(),
+                    requireContext().getPackageName() + ".profileprovider", cameraFile);
+            cameraLauncher.launch(destination);
+        } catch (Exception error) {
+            removeCameraFile();
+            Toast.makeText(requireContext(), "Could not start camera: " + error.getMessage(),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void uploadProfileImage(Uri imageUri) {
+        if (!isAdded() || photoUploading) return;
         if (firebaseAuth.getCurrentUser() == null) {
-            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Please sign in before uploading",
+                    Toast.LENGTH_LONG).show();
+            removeCameraFile();
             return;
         }
+        final String uid = firebaseAuth.getCurrentUser().getUid();
+        final Context app = requireContext().getApplicationContext();
+        setPhotoLoading(true);
+        photoWorker.execute(() -> {
+            byte[] jpeg;
+            try {
+                // Android 9+ ImageDecoder handles image orientation and bounds large images
+                // in memory before JPEG conversion. Re-encoding strips most photo metadata.
+                ImageDecoder.Source source = ImageDecoder.createSource(
+                        app.getContentResolver(), imageUri);
+                Bitmap bitmap = ImageDecoder.decodeBitmap(source, (decoder, info, src) -> {
+                    int w = info.getSize().getWidth();
+                    int h = info.getSize().getHeight();
+                    float scale = Math.min(1f, 768f / Math.max(w, h));
+                    if (scale < 1f) decoder.setTargetSize(Math.max(1, Math.round(w * scale)),
+                            Math.max(1, Math.round(h * scale)));
+                    decoder.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);
+                });
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
+                if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 82, output)) {
+                    throw new IOException("Image could not be compressed");
+                }
+                jpeg = output.toByteArray();
+                bitmap.recycle();
+                if (jpeg.length == 0 || jpeg.length > 2 * 1024 * 1024) {
+                    throw new IOException("Photo is too large to upload");
+                }
+            } catch (Exception | OutOfMemoryError error) {
+                if (isAdded()) requireActivity().runOnUiThread(() -> {
+                    setPhotoLoading(false);
+                    Toast.makeText(requireContext(), "Could not process photo. Try another image.",
+                            Toast.LENGTH_LONG).show();
+                    removeCameraFile();
+                });
+                return;
+            }
+            if (isAdded()) requireActivity().runOnUiThread(() -> {
+                removeCameraFile();
+                if (!isAdded() || firebaseAuth.getCurrentUser() == null
+                        || !uid.equals(firebaseAuth.getCurrentUser().getUid())) {
+                    setPhotoLoading(false);
+                    return;
+                }
+                uploadJpeg(uid, jpeg);
+            });
+        });
+    }
 
-        String userId = firebaseAuth.getCurrentUser().getUid();
-
-        StorageReference imageRef = firebaseStorage.getReference()
-                .child("profile_images")
-                .child(userId + ".jpg");
-
-        changePhotoButton.setEnabled(false);
-        changePhotoButton.setText("Uploading...");
-
-        imageRef.putFile(imageUri)
+    private void uploadJpeg(String uid, byte[] jpeg) {
+        StorageReference ref = firebaseStorage.getReference()
+                .child("profile_images").child(uid + ".jpg");
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("image/jpeg").build();
+        ref.putBytes(jpeg, metadata)
                 .continueWithTask(task -> {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw task.getException() != null
+                                ? task.getException() : new IOException("Storage upload failed");
                     }
-                    return imageRef.getDownloadUrl();
+                    return ref.getDownloadUrl();
                 })
-                .addOnSuccessListener(downloadUri -> {
-                    firebaseFirestore.collection("users")
-                            .document(userId)
-                            .update("profileImageUrl", downloadUri.toString())
+                .addOnSuccessListener(download -> {
+                    if (!isAdded() || firebaseAuth.getCurrentUser() == null
+                            || !uid.equals(firebaseAuth.getCurrentUser().getUid())) {
+                        setPhotoLoading(false);
+                        return;
+                    }
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("profileImageUrl", download.toString());
+                    // Same Storage path can keep the same download URL. This revision
+                    // makes Glide refresh the image after an overwrite.
+                    updates.put("profileImageUpdatedAtMillis", System.currentTimeMillis());
+                    firebaseFirestore.collection("users").document(uid).update(updates)
                             .addOnSuccessListener(unused -> {
-                                changePhotoButton.setEnabled(true);
-                                changePhotoButton.setText("Change Photo");
-                                Toast.makeText(requireContext(), "Profile photo updated", Toast.LENGTH_SHORT).show();
+                                if (!isAdded()) return;
+                                setPhotoLoading(false);
+                                Toast.makeText(requireContext(), "Profile photo saved",
+                                        Toast.LENGTH_SHORT).show();
                             })
-                            .addOnFailureListener(e -> {
-                                changePhotoButton.setEnabled(true);
-                                changePhotoButton.setText("Change Photo");
-                                Toast.makeText(requireContext(), "Failed to save image URL: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            .addOnFailureListener(error -> {
+                                if (!isAdded()) return;
+                                setPhotoLoading(false);
+                                Toast.makeText(requireContext(),
+                                        "Photo uploaded, but profile could not be updated: "
+                                                + error.getMessage(), Toast.LENGTH_LONG).show();
                             });
                 })
-                .addOnFailureListener(e -> {
-                    changePhotoButton.setEnabled(true);
-                    changePhotoButton.setText("Change Photo");
-                    Toast.makeText(requireContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                .addOnFailureListener(error -> {
+                    if (!isAdded()) return;
+                    setPhotoLoading(false);
+                    Toast.makeText(requireContext(),
+                            "Photo upload unavailable. Check Firebase Blaze plan, "
+                                    + "Storage bucket and owner-only rules.",
+                            Toast.LENGTH_LONG).show();
                 });
+    }
+
+    private void setPhotoLoading(boolean loading) {
+        photoUploading = loading;
+        if (changePhotoButton != null) {
+            changePhotoButton.setEnabled(!loading);
+            changePhotoButton.setText(loading ? "Uploading photo..." : "Change Photo");
+        }
+    }
+
+    private void removeCameraFile() {
+        if (cameraFile != null) {
+            if (cameraFile.exists()) cameraFile.delete();
+            cameraFile = null;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (profileRegistration != null) {
+            profileRegistration.remove();
+            profileRegistration = null;
+        }
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        photoWorker.shutdown();
+        super.onDestroy();
     }
 
     private void showDeleteAccountDialog() {
