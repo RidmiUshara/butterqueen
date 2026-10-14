@@ -15,6 +15,10 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +34,9 @@ import java.util.UUID;
 import lk.jiat.butterqueen.R;
 
 public class CustomCakeActivity extends AppCompatActivity {
+    // Demo on Spark: users can preview/select a photo, but it cannot be uploaded yet.
+    // Change this only after configuring Firebase Storage and its security rules.
+    private static final boolean PHOTO_UPLOAD_ENABLED = false;
     private EditText messageInput, dateInput, notesInput;
     private Spinner flavourInput, weightInput;
     private ImageView photoPreview;
@@ -57,6 +64,7 @@ public class CustomCakeActivity extends AppCompatActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_custom_cake);
+        applyWindowInsets();
         findViewById(R.id.customBack).setOnClickListener(v -> finish());
         messageInput = findViewById(R.id.customMessage);
         dateInput = findViewById(R.id.customDate);
@@ -89,8 +97,18 @@ public class CustomCakeActivity extends AppCompatActivity {
         submitButton.setOnClickListener(v -> submitRequest());
     }
 
+    private void applyWindowInsets() {
+        View root = findViewById(R.id.customCakeRoot);
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
+    }
+
     private void setPhoto(Bitmap bitmap) {
-        // Reduce memory usage and upload a compact reference photo.
+        // Keep a compact local image for on-device preview.
         int max = 1280;
         float scale = Math.min(1f, max / (float) Math.max(bitmap.getWidth(), bitmap.getHeight()));
         Bitmap sized = scale < 1 ? Bitmap.createScaledBitmap(bitmap,
@@ -128,10 +146,24 @@ public class CustomCakeActivity extends AppCompatActivity {
         }
         submitButton.setEnabled(false);
         submitButton.setText("Sending request...");
-        // Prevent the selected image changing during an active upload.
+        // Prevent form edits while submitting.
         takePhotoButton.setEnabled(false);
         galleryButton.setEnabled(false);
         removePhotoButton.setEnabled(false);
+
+        if (photoBytes != null && !PHOTO_UPLOAD_ENABLED) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Photo preview only")
+                    .setMessage("Photo upload is not available on this demo plan. "
+                            + "Send your cake details without the reference photo? "
+                            + "The bakery will not receive this picture.")
+                    .setPositiveButton("Send details only", (dialog, which) ->
+                            saveRequest(user, date, "", ""))
+                    .setNegativeButton("Keep editing", (dialog, which) -> resetSubmitControls())
+                    .setOnCancelListener(dialog -> resetSubmitControls())
+                    .show();
+            return;
+        }
 
         if (photoBytes != null) {
             String path = "custom_cake_requests/" + user.getUid() + "/" + UUID.randomUUID() + ".jpg";
@@ -168,11 +200,15 @@ public class CustomCakeActivity extends AppCompatActivity {
     }
 
     private void showFailure(String message) {
+        resetSubmitControls();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void resetSubmitControls() {
         submitButton.setEnabled(true);
         submitButton.setText("Submit Custom Cake Request");
         takePhotoButton.setEnabled(true);
         galleryButton.setEnabled(true);
-        removePhotoButton.setEnabled(true);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        removePhotoButton.setEnabled(photoBytes != null);
     }
 }
