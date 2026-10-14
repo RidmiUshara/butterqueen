@@ -1,6 +1,6 @@
 # ButterQueen Android app
 
-ButterQueen is a Java Android cake ordering app. The current code includes Firebase Authentication, Firestore product and cart data, checkout, orders, profile image upload, delivery area maps, and **PayHere sandbox** checkout.
+ButterQueen is a Java Android cake ordering app. The current code includes Firebase Authentication, Firestore product and cart data, checkout, orders, local-only profile photos, delivery area maps, and **PayHere sandbox** checkout.
 
 ## Local setup
 
@@ -31,8 +31,10 @@ The repository's original import included a Maps key in the manifest. The manife
 
 ## Receipts, settings, and device features
 
-- In **Orders**, tap an order to open its current server-backed receipt and choose **Download PDF**. Android's document picker saves it without storage permissions. Item units, delivery fees, and payment status appear on screen and in the PDF. A pending cash-on-delivery or PayHere sandbox order receipt is **not proof of payment**.
+- In **Orders**, tap an order to open its current server-backed receipt and choose **Download PDF** or **Share PDF**. The document picker saves without storage permission; the Android Sharesheet can securely grant temporary access to the receipt PDF to a chosen app, including **Quick Share** for Bluetooth/Wi-Fi transfer on compatible devices. Sharing is initiated by the customer and may disclose name, address and phone number to the recipient. A pending cash-on-delivery or PayHere sandbox order receipt is **not proof of payment**.
 - **Biometric app lock** is optional per account on this device. Set a six-digit backup code, then verify with an enrolled fingerprint or face. The app locks when it leaves the foreground. The backup code works if biometrics are unavailable; a forgotten code can be reset online with the Firebase account password.
 - The backup code is stored as a salted PBKDF2 verifier with a retry cooldown. Local preferences are excluded from cloud and device backup. This is a device UI lock; Firebase Authentication and Firestore Security Rules still control backend access.
 - **Shake to refresh catalog** uses the accelerometer only while Home is visible. It is off by default and disabled on devices without an accelerometer.
+- Customer profile photos are saved in **app-private internal storage** under the signed-in account UID. Camera or gallery works without Firebase Storage, billing or Storage Rules. Photos stay on the same device and are removed when the app is uninstalled or its storage is cleared. The customer Profile and navigation drawer display the same local file. See [profile photo notes](docs/customer-profile-photos.md).
 - Settings offers follow-device, light, and dark appearance. Help and About provide **0763227525** and **info@butterqueen.com** with call and email actions.
+- See the [complete marking rubric evidence and viva test checklist](docs/viva-marking-evidence.md) for criterion-by-criterion source references, hardware tests, diagrams to include in university documentation and limitations.
