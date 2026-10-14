@@ -41,16 +41,12 @@ public class splashActivity extends AppCompatActivity {
         }
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent;
-
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                intent = new Intent(splashActivity.this, MainActivity.class);
+                AccountHomeRouter.openHome(this);
             } else {
-                intent = new Intent(splashActivity.this, SignInActivity.class);
+                startActivity(new Intent(this, SignInActivity.class));
+                finish();
             }
-
-            startActivity(intent);
-            finish();
         }, SPLASH_DELAY);
     }
 }
