@@ -5,7 +5,6 @@ import android.Manifest;
 import android.os.Build;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
