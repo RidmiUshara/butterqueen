@@ -21,6 +21,16 @@
 
 
 
+        <!-- Full-resolution camera capture with an app-private cache URI. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.profileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/profile_camera_paths" />
+        </provider>
         <activity android:name=".activity.AdminOverviewActivity" android:exported="false" />
         <activity
             android:name=".activity.AdminDashboardActivity"
