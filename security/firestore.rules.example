@@ -53,6 +53,33 @@ service cloud.firestore {
       match /cart/{cartId} {
         allow read, write: if isOwner(uid) || isAdmin();
       }
+      // Private per-user notifications, created by Cloud Functions Admin SDK.
+      match /notifications/{notificationId} {
+        allow get, list: if isOwner(uid);
+        allow create, delete: if false;
+        allow update: if isOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['read'])
+          && request.resource.data.read == true;
+      }
+
+      // Android FCM registration, isolated to the signed-in account.
+      match /pushTokens/{installationId} {
+        allow get, list: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly([
+            'token', 'platform', 'updatedAtMillis'
+          ])
+          && request.resource.data.keys().hasAll([
+            'token', 'platform', 'updatedAtMillis'
+          ])
+          && request.resource.data.token is string
+          && request.resource.data.token.size() > 20
+          && request.resource.data.token.size() < 4096
+          && request.resource.data.platform == 'android'
+          && request.resource.data.updatedAtMillis is int;
+        allow delete: if isOwner(uid);
+      }
     }
 
     match /categories/{categoryId} {
