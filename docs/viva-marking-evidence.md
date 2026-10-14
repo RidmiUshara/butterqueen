@@ -44,7 +44,7 @@ Legend: **Present** = corresponding code exists; **Partial** = not all wording/f
 | 5.1 Async server requests | 3/3 | Firestore task listeners in `CheckoutActivity.java`, `OrdersFragment.java` | Present; show online/offline states |
 | 5.2 Cloud | 2/3 | Firebase Authentication + Firestore in `SignInActivity.java`, `AdminDashboardActivity.java` | Present; Firebase Storage not required by the chosen **local-only** photo design |
 | 5.3 CRUD | 3/3 | `AdminDashboardActivity.java`, `AdminProductActivity.java`, `AdminCustomCakeRequestsActivity.java` | Present: admin creates/updates/deletes catalog and updates order status; rules must be deployed |
-| 5.4 JSON encoding/decoding | 1/1 | `app/build.gradle` includes Gson; Firestore SDK serializes data objects | **Additional evidence needed**: an explicit, demonstrable app-owned Gson/JSONObject encode+decode code path has not been verified by this audit; dependency alone is not enough |
+| 5.4 JSON encoding/decoding | 1/1 | `data/OrderSummaryJson.java`, `activity/OrderReceiptActivity.java`, `OrderSummaryJsonTest.java` | **Present now**: user taps **Copy order summary as JSON** on receipt; Gson encodes a contact-free summary, a parser decodes/validates it; two unit tests check roundtrip/schema and privacy |
 | 6.1 Maps | 4/4 | `fragment/DeliveryAreasFragment.java` | Present: Google Map, markers, circles, click selection, distance/delivery bands. **Current GPS location, routes/polylines not evidenced**; avoid claiming all Google Maps examples |
 | 7.1 Telecom operations | 2/2 | `data/ContactActions.java`, `fragment/HelpFragment.java` | Present: dialer and email client implicit intents (not silent calls/SMS) |
 | 7.2 Sensors | 2/2 | `fragment/HomeFragment.java` accelerometer + `SettingFragment.java` | Present: opt-in shake to refresh, lifecycle unregister |
@@ -61,7 +61,7 @@ Legend: **Present** = corresponding code exists; **Partial** = not all wording/f
 3. **Offline + preferences (1 minute):** show Settings theme toggle, shake setting, restart app to prove SharedPreferences; show Room local cart snapshot while offline (read only; don't claim queued writes sync).
 4. **Device capabilities (1 minute):** open Camera/Gallery from Profile, save picture on-device; open delivery area Google Map and tap a pin; show call/email implicit intents.
 5. **Cloud CRUD (1 minute):** admin adds/edits a product and category; customer orders; admin reviews and changes an order status; explain Firestore Security Rules.
-6. **Graphs and receipts (1 minute):** admin donut/monthly chart; open customer order receipt and Download PDF. **Share PDF** opens Android Sharesheet; select Quick Share on a supported phone to demonstrate real wireless exchange.
+6. **Graphs and receipts (1 minute):** admin donut/monthly chart; open customer order receipt and Download PDF. **Share PDF** opens Android Sharesheet; select Quick Share on a supported phone to demonstrate real wireless exchange. Tap **Copy order summary as JSON** to show Gson serialization without personal contact data.
 7. **Security/limitations (1 minute):** Firebase roles prevent customer admin privileges; photo is local-only; PayHere is sandbox and payment verification requires a trusted backend.
 
 ## Quick Q&A for the examiner
@@ -103,6 +103,7 @@ Record emulator screenshots and date/result in the university submission. CI suc
 | T09 | Open Sales Reports | Charts match real order statuses |
 | T10 | Save receipt PDF | Android document picker saves a valid PDF |
 | T11 | Share receipt PDF to another device | Sharesheet opens; Quick Share wireless transfer verified if available |
+| T11b | Copy order summary as JSON | Clipboard contains schemaVersion/orderId/items/totals; excludes customer name, address, phone and notes |
 | T12 | Try an unauthorized user against admin data | Denied by Firestore rules |
 | T13 | Rotate screen, increase system font | Inputs/buttons remain accessible |
 | T14 | Enable/disable notification permission | No crash; notifications appear only if granted |
@@ -111,7 +112,7 @@ Record emulator screenshots and date/result in the university submission. CI suc
 ## Highest-value next enhancements (after stable viva build)
 
 1. **Improved documentation:** ER/schema diagram, architecture diagram, UML Activity/Fragment lifecycle, screenshots, test evidence table, limits and references.
-2. **Explicit JSON import/export:** demo-grade Gson encode and decode of user-approved order summaries; validate schema and remove private fields before export.
+2. **JSON demonstration:** run `OrderSummaryJsonTest` and demonstrate **Copy order summary as JSON**; future enhancement could add a validated JSON import with user consent.
 3. **Actual wireless transfer test:** verify Quick Share PDF between two Android devices. If direct Bluetooth or Wi-Fi APIs are explicitly required, plan permission/device pairing/testing rather than claiming Sharesheet fulfills every requirement.
 4. **Offline write queue & reconciliation:** WorkManager + Room pending actions, conflict detection, and server-authoritative totals; much bigger scope than a cosmetic change.
 5. **Cloud backend hardening:** authoritative payment callback/webhook for PayHere, validated pricing on trusted server, audit trail for status updates and deletion workflow.
