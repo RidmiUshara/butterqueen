@@ -2,6 +2,9 @@ package lk.jiat.butterqueen.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -43,6 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import lk.jiat.butterqueen.R;
+import lk.jiat.butterqueen.notification.OrderNotificationHelper;
 import lk.jiat.butterqueen.data.CartManager;
 import lk.jiat.butterqueen.model.CartItem;
 import lk.jiat.butterqueen.model.Product;
@@ -116,6 +120,13 @@ public class CheckoutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_checkout);
+
+        // Android 13+: ask the customer before showing order notifications.
+        if (Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1201);
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -463,8 +474,8 @@ public class CheckoutActivity extends AppCompatActivity {
                             || Boolean.FALSE.equals(doc.getBoolean("available"))
                             || !UnitPricing.isSupported(product.getUnitType())
                             || !UnitPricing.normalize(product.getUnitType(),
-                                    product.getCategoryName()).equals(
-                                            UnitPricing.normalize(item.getUnitType(), null))
+                            product.getCategoryName()).equals(
+                            UnitPricing.normalize(item.getUnitType(), null))
                             || Math.abs(product.getPrice() - item.getProductPrice()) > 0.005) {
                         catalogChanged();
                         return;
@@ -667,6 +678,8 @@ public class CheckoutActivity extends AppCompatActivity {
 
         batch.commit()
                 .addOnSuccessListener(unused -> {
+                    OrderNotificationHelper.showOrderPlaced(
+                            this, orderRef.getId(), "payhere".equals(paymentMethod));
                     CartManager.clearLocalCache();
 
                     String message =
@@ -687,7 +700,7 @@ public class CheckoutActivity extends AppCompatActivity {
                             .setCancelable(false)
                             .setPositiveButton("OK", (dialog, which) -> {
                                 Toast.makeText(this, "payhere".equals(paymentMethod)
-                                        ? "Payment verification pending" : "Thank you for your order",
+                                                ? "Payment verification pending" : "Thank you for your order",
                                         Toast.LENGTH_SHORT).show();
                                 finish();
                             })

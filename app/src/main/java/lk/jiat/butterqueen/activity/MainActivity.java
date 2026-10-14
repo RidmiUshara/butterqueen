@@ -1,19 +1,30 @@
-package lk.jiat.butterqueen.activity;
+
+        package lk.jiat.butterqueen.activity;
 
 import android.content.Intent;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import lk.jiat.butterqueen.fragment.DeliveryAreasFragment;
+import lk.jiat.butterqueen.fragment.HomeFragment;
+import lk.jiat.butterqueen.fragment.HelpFragment;
+import lk.jiat.butterqueen.fragment.OrdersFragment;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +35,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -32,7 +44,6 @@ import lk.jiat.butterqueen.R;
 import lk.jiat.butterqueen.fragment.AboutFragment;
 import lk.jiat.butterqueen.fragment.CategoryFragment;
 import lk.jiat.butterqueen.fragment.DeliveryAreasFragment;
-import lk.jiat.butterqueen.fragment.HomeFragment;
 import lk.jiat.butterqueen.fragment.HelpFragment;
 import lk.jiat.butterqueen.fragment.OrdersFragment;
 import lk.jiat.butterqueen.fragment.ProfileFragment;
@@ -51,6 +62,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActionBarDrawerToggle toggle;
     private boolean syncingBottomNavigation;
 
+    // Network connectivity monitoring
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private Snackbar offlineSnackbar;
+    private boolean networkCallbackRegistered = false;
+
+    // Battery receiver: active only while this Activity is visible.
+    private boolean batteryReceiverRegistered = false;
+    private final BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null || intent.getAction() == null) return;
+            String action = intent.getAction();
+            String message;
+            if (Intent.ACTION_BATTERY_LOW.equals(action)) {
+                message = "Battery low. Please charge your device.";
+            } else if (Intent.ACTION_POWER_CONNECTED.equals(action)) {
+                message = "Charger connected.";
+            } else if (Intent.ACTION_POWER_DISCONNECTED.equals(action)) {
+                message = "Charger disconnected.";
+            } else {
+                return;
+            }
+            View root = findViewById(R.id.mainContent);
+            if (root != null) {
+                Snackbar.make(root, message, Snackbar.LENGTH_LONG).show();
+            }
+        }
+    };
+
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
@@ -63,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -106,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 loadFragment(new HomeFragment(), "Home");
                 return true;
 
+
             } else if (id == R.id.bottom_cart) {
                 loadFragment(new cartFragment(), "Cart");
                 return true;
@@ -123,7 +168,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         if (savedInstanceState == null) {
-            loadFragment(new HomeFragment(), "Home");
+            if (getIntent().getBooleanExtra("open_orders", false)) {
+                loadFragment(new OrdersFragment(), "Orders");
+                getIntent().removeExtra("open_orders");
+            } else {
+                loadFragment(new HomeFragment(), "Home");
+            }
             navigationView.setCheckedItem(R.id.nav_home);
         } else {
             Fragment restored = getSupportFragmentManager().findFragmentById(R.id.contentFrame);
@@ -132,6 +182,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 syncDrawerSelection(restored);
                 toolbar.setTitle(titleFor(restored));
             }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent != null && intent.getBooleanExtra("open_orders", false)) {
+            loadFragment(new OrdersFragment(), "Orders");
+            intent.removeExtra("open_orders");
         }
     }
 
@@ -240,7 +300,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             loadFragment(new cartFragment(), "Cart");
 
         } else if (id == R.id.nav_delivery_areas) {
-                loadFragment(new DeliveryAreasFragment(), "Delivery Areas");
+            loadFragment(new DeliveryAreasFragment(), "Delivery Areas");
 
 
         } else if (id == R.id.nav_message) {
@@ -366,4 +426,88 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             super.onBackPressed();
         }
     }
+
+    // Checks whether Android has validated an internet connection.
+    private boolean hasInternetConnection() {
+        if (connectivityManager == null) return false;
+        Network network = connectivityManager.getActiveNetwork();
+        if (network == null) return false;
+        NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+        return capabilities != null
+                && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+    }
+
+    // Snackbar operations are always performed on the main UI thread.
+    private void updateNetworkStatus() {
+        if (hasInternetConnection()) {
+            if (offlineSnackbar != null) {
+                offlineSnackbar.dismiss();
+                offlineSnackbar = null;
+            }
+        } else if (offlineSnackbar == null) {
+            offlineSnackbar = Snackbar.make(
+                    findViewById(R.id.mainContent),
+                    "No Internet Connection. Please check your network.",
+                    Snackbar.LENGTH_INDEFINITE
+            );
+            offlineSnackbar.show();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!batteryReceiverRegistered) {
+            IntentFilter batteryFilter = new IntentFilter();
+            batteryFilter.addAction(Intent.ACTION_BATTERY_LOW);
+            batteryFilter.addAction(Intent.ACTION_POWER_CONNECTED);
+            batteryFilter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+            ContextCompat.registerReceiver(this, batteryReceiver, batteryFilter,
+                    ContextCompat.RECEIVER_NOT_EXPORTED);
+            batteryReceiverRegistered = true;
+        }
+        if (connectivityManager != null && !networkCallbackRegistered) {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(@NonNull Network network) {
+                    runOnUiThread(() -> updateNetworkStatus());
+                }
+
+                @Override
+                public void onLost(@NonNull Network network) {
+                    runOnUiThread(() -> updateNetworkStatus());
+                }
+
+                @Override
+                public void onCapabilitiesChanged(@NonNull Network network,
+                                                  @NonNull NetworkCapabilities capabilities) {
+                    runOnUiThread(() -> updateNetworkStatus());
+                }
+            };
+            connectivityManager.registerDefaultNetworkCallback(networkCallback);
+            networkCallbackRegistered = true;
+        }
+        updateNetworkStatus();
+    }
+
+    @Override
+    protected void onStop() {
+        if (batteryReceiverRegistered) {
+            unregisterReceiver(batteryReceiver);
+            batteryReceiverRegistered = false;
+        }
+        if (networkCallbackRegistered && connectivityManager != null) {
+            connectivityManager.unregisterNetworkCallback(networkCallback);
+            networkCallbackRegistered = false;
+        }
+        if (offlineSnackbar != null) {
+            offlineSnackbar.dismiss();
+            offlineSnackbar = null;
+        }
+        super.onStop();
+    }
+
 }
+
+

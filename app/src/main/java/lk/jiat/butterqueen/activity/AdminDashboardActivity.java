@@ -55,6 +55,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
         addCategoryButton = findViewById(R.id.adminAddCategoryButton);
         addProductButton = findViewById(R.id.adminAddProductButton);
         starterButton = findViewById(R.id.adminStarterButton);
+        findViewById(R.id.adminCustomCakeRequestsButton).setOnClickListener(v ->
+                startActivity(new Intent(this, AdminCustomCakeRequestsActivity.class)));
+        findViewById(R.id.adminSalesReportsButton).setOnClickListener(v ->
+                startActivity(new Intent(this, AdminSalesReportsActivity.class)));
         findViewById(R.id.adminBack).setOnClickListener(v -> finish());
         findViewById(R.id.adminProductsTab).setOnClickListener(v -> {
             showingOrders = false;

@@ -86,6 +86,22 @@
             android:layout_height="wrap_content"
             android:text="Set up Cakes, Cupcakes and Brownies"
             android:textAllCaps="false" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/adminCustomCakeRequestsButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Custom Cake Requests"
+            android:textAllCaps="false" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/adminSalesReportsButton"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Sales Reports &amp; Analytics"
+            android:textAllCaps="false" />
         <TextView
             android:id="@+id/adminStatusText"
             android:layout_width="match_parent"

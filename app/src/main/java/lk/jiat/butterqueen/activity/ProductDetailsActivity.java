@@ -1,6 +1,10 @@
 package lk.jiat.butterqueen.activity;
 
 import android.os.Bundle;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,6 +31,26 @@ import lk.jiat.butterqueen.model.Product;
 import lk.jiat.butterqueen.model.UnitPricing;
 
 public class ProductDetailsActivity extends AppCompatActivity {
+
+    private final ActivityResultLauncher<Void> takePhotoLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), bitmap -> {
+                if (bitmap != null) {
+                    ImageView preview = findViewById(R.id.referencePhotoPreview);
+                    preview.setImageBitmap(bitmap);
+                    preview.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "Reference photo preview ready", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String> choosePhotoLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+                if (uri != null) {
+                    ImageView preview = findViewById(R.id.referencePhotoPreview);
+                    preview.setImageURI(uri);
+                    preview.setVisibility(View.VISIBLE);
+                    Toast.makeText(this, "Reference photo preview ready", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     private ImageButton backButton, wishlistButton, minusQtyButton, plusQtyButton;
     private ImageView productImageView;
@@ -64,6 +88,11 @@ public class ProductDetailsActivity extends AppCompatActivity {
         selectionTotalTextView = findViewById(R.id.selectionTotalTextView);
         availabilityTextView = findViewById(R.id.availabilityTextView);
         addToCartButton = findViewById(R.id.addToCartButton);
+
+        findViewById(R.id.takeReferencePhotoButton).setOnClickListener(v ->
+                takePhotoLauncher.launch(null));
+        findViewById(R.id.chooseReferencePhotoButton).setOnClickListener(v ->
+                choosePhotoLauncher.launch("image/*"));
 
         backButton.setOnClickListener(v -> finish());
         wishlistButton.setOnClickListener(v -> {
