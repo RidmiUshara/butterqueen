@@ -226,7 +226,7 @@ public class AdminOverviewActivity extends AppCompatActivity {
     private MaterialButton button(String label, boolean filled) {
         MaterialButton button = new MaterialButton(this);
         button.setText(label);
-        button.setTextAllCaps(false);
+        button.setAllCaps(false);
         button.setTextSize(12);
         button.setCornerRadius(dp(16));
         if (filled) {
