@@ -1,6 +1,8 @@
 package lk.jiat.butterqueen.activity;
 
 import android.content.Context;
+import android.content.ClipData;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -82,6 +87,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         });
         findViewById(R.id.receiptBack).setOnClickListener(v -> finish());
         findViewById(R.id.receiptDownload).setOnClickListener(v -> createPdf.launch(fileName()));
+        findViewById(R.id.receiptShare).setOnClickListener(v -> shareLatest());
         if (adminView) {
             AdminAccess.verify(allowed -> {
                 if (isFinishing() || isDestroyed()) return;
@@ -229,6 +235,57 @@ public final class OrderReceiptActivity extends AppCompatActivity {
         return (int) (getResources().getDisplayMetrics().density * value + 0.5f);
     }
 
+
+    /**
+     * Export a fresh, ownership-verified receipt to private cache and let the
+     * customer explicitly choose a target (including Quick Share if installed).
+     * No storage or Bluetooth runtime permissions are required for Sharesheet.
+     */
+    private void shareLatest() {
+        if (!loaded || loading || !sameAccount()) return;
+        setLoading(true);
+        fetch(receipt -> pdfWorker.execute(() -> {
+            Uri shareUri = null;
+            try {
+                File directory = new File(getCacheDir(), "shared_receipts");
+                if (!directory.isDirectory() && !directory.mkdirs()) {
+                    throw new IOException("Cannot prepare receipt share directory");
+                }
+                File pdf = File.createTempFile("ButterQueen-Receipt-", ".pdf", directory);
+                try (FileOutputStream output = new FileOutputStream(pdf)) {
+                    OrderReceiptPdf.write(receipt, output);
+                }
+                shareUri = FileProvider.getUriForFile(this,
+                        getPackageName() + ".profileprovider", pdf);
+            } catch (IOException | RuntimeException exception) {
+                android.util.Log.w("OrderReceipt", "PDF sharing preparation failed", exception);
+            }
+            final Uri uri = shareUri;
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                setLoading(false);
+                if (!sameAccount()) return;
+                if (uri == null) {
+                    Toast.makeText(this, "Could not prepare receipt PDF",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("application/pdf");
+                share.putExtra(Intent.EXTRA_STREAM, uri);
+                share.setClipData(ClipData.newUri(
+                        getContentResolver(), "ButterQueen order receipt", uri));
+                share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    startActivity(Intent.createChooser(share, "Share order receipt"));
+                } catch (ActivityNotFoundException | SecurityException failure) {
+                    Toast.makeText(this, "No compatible sharing app found",
+                            Toast.LENGTH_LONG).show();
+                }
+            });
+        }));
+    }
+
     private void exportLatest(Uri uri) {
         if (loading || !sameAccount()) return;
         setLoading(true);
@@ -254,6 +311,7 @@ public final class OrderReceiptActivity extends AppCompatActivity {
     private void setLoading(boolean value) {
         loading = value;
         findViewById(R.id.receiptDownload).setEnabled(!value && loaded);
+        findViewById(R.id.receiptShare).setEnabled(!value && loaded);
     }
 
     private void fail() {
