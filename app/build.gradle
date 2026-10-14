@@ -1,18 +1,32 @@
+
 plugins {
     alias(libs.plugins.android.application)
     id 'com.google.gms.google-services'
 }
 
-// Values needed at build time stay in Android Studio's ignored local.properties.
+// Read local configuration values
 def localConfig = new Properties()
 def localConfigFile = rootProject.file('local.properties')
+
 if (localConfigFile.exists()) {
-    localConfigFile.withInputStream { stream -> localConfig.load(stream) }
+    localConfigFile.withInputStream { stream ->
+        localConfig.load(stream)
+    }
 }
-def mapsApiKey = localConfig.getProperty('MAPS_API_KEY', '').trim()
-def payHereMerchantId = localConfig.getProperty('PAYHERE_MERCHANT_ID', '').trim()
-if (payHereMerchantId && !(payHereMerchantId ==~ /[0-9]+/)) {
-    throw new GradleException('PAYHERE_MERCHANT_ID must contain digits only')
+
+def mapsApiKey = localConfig.getProperty(
+        'MAPS_API_KEY', ''
+).trim()
+
+def payHereMerchantId = localConfig.getProperty(
+        'PAYHERE_MERCHANT_ID', ''
+).trim()
+
+if (payHereMerchantId &&
+        !(payHereMerchantId ==~ /[0-9]+/)) {
+    throw new GradleException(
+            'PAYHERE_MERCHANT_ID must contain digits only'
+    )
 }
 
 android {
@@ -21,13 +35,20 @@ android {
 
     defaultConfig {
         applicationId "lk.jiat.butterqueen"
+
         minSdk 28
         targetSdk 36
+
         versionCode 1
         versionName "1.0"
 
-        manifestPlaceholders = [MAPS_API_KEY: mapsApiKey]
-        buildConfigField "String", "PAYHERE_MERCHANT_ID", '"'+payHereMerchantId+'"'
+        manifestPlaceholders = [
+                MAPS_API_KEY: mapsApiKey
+        ]
+
+        buildConfigField "String",
+                "PAYHERE_MERCHANT_ID",
+                '"' + payHereMerchantId + '"'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,7 +56,10 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'
+            ), 'proguard-rules.pro'
         }
     }
 
@@ -51,33 +75,54 @@ android {
 }
 
 dependencies {
+
+    // Android UI
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
+
+    // Testing
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+
+    // Images
     implementation libs.picasso
     implementation libs.glide
 
+    // UI Components
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.biometric:biometric:1.1.0'
 
+    // Lombok
     compileOnly "org.projectlombok:lombok:1.18.44"
     annotationProcessor "org.projectlombok:lombok:1.18.44"
 
+    // PayHere SDK
     implementation 'com.github.PayHereDevs:payhere-android-sdk:v3.0.18'
+
+    // Existing compatibility dependencies
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'com.google.code.gson:gson:2.8.0'
 
+    // Firebase
+    implementation platform(
+            "com.google.firebase:firebase-bom:34.11.0"
+    )
 
-    implementation platform("com.google.firebase:firebase-bom:34.11.0")
     implementation "com.google.firebase:firebase-auth"
     implementation "com.google.firebase:firebase-firestore"
     implementation "com.google.firebase:firebase-storage"
 
+    // Google Maps
     implementation "com.google.android.gms:play-services-maps:20.0.0"
     implementation "com.google.maps.android:android-maps-utils:4.0.0"
+
+    // Stripe
     implementation "com.stripe:stripe-android:23.1.0"
+
+    // Room SQLite Database
+    implementation 'androidx.room:room-runtime:2.8.5'
+    annotationProcessor 'androidx.room:room-compiler:2.8.5'
 }

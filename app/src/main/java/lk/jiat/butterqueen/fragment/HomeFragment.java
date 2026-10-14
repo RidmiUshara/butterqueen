@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Locale;
 
 import lk.jiat.butterqueen.activity.ProductDetailsActivity;
+import lk.jiat.butterqueen.activity.CustomCakeActivity;
+import lk.jiat.butterqueen.activity.MyCustomCakeRequestsActivity;
 import lk.jiat.butterqueen.data.AppSettings;
 import lk.jiat.butterqueen.adapter.CategoryAdapter;
 import lk.jiat.butterqueen.adapter.ProductAdapter;
@@ -128,7 +130,7 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     private void updateOccasionVisibility() {
         boolean show = "ALL".equals(selectedCategory)
                 || UnitPricing.isKg(UnitPricing.normalize(
-                        selectedCategoryUnit, selectedCategoryName));
+                selectedCategoryUnit, selectedCategoryName));
         binding.cakeOccasionChips.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
@@ -188,6 +190,10 @@ public class HomeFragment extends Fragment implements SensorEventListener {
     }
 
     private void setupActions() {
+        binding.customCakeButton.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), CustomCakeActivity.class)));
+        binding.myCustomCakeRequestsButton.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), MyCustomCakeRequestsActivity.class)));
         binding.orderNowButton.setOnClickListener(v ->
                 binding.recyclerViewCakes.smoothScrollToPosition(0)
         );

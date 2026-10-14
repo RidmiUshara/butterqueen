@@ -5,8 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
+import lk.jiat.butterqueen.activity.ProductDetailsActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import lk.jiat.butterqueen.activity.ProductDetailsActivity;
 import lk.jiat.butterqueen.adapter.ProductAdapter;
 import lk.jiat.butterqueen.data.WishlistManager;
 import lk.jiat.butterqueen.databinding.FragmentWishlistBinding;

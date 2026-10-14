@@ -1,5 +1,7 @@
 package lk.jiat.butterqueen.adapter;
 
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,8 +70,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                         ? "Price under review"
                         : !product.isAvailable() ? "Currently unavailable"
                         : UnitPricing.priceLabel(product.getPrice(),
-                                UnitPricing.normalize(product.getUnitType(),
-                                        product.getCategoryName()))
+                        UnitPricing.normalize(product.getUnitType(),
+                                product.getCategoryName()))
         );
 
         if (product.getImageUrl() != null && !product.getImageUrl().trim().isEmpty()) {
@@ -92,23 +94,58 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         });
 
-        holder.wishlistButton.setOnClickListener(v -> {
-            boolean isWishlistedNow = WishlistManager.toggleWishlist(product);
-            updateWishlistIcon(holder.wishlistButton, isWishlistedNow);
+        // Tap the heart, or double-tap the product image to update the wishlist.
+        holder.wishlistButton.setOnClickListener(v -> toggleWishlistWithAnimation(holder, product));
 
-            Toast.makeText(
-                    holder.itemView.getContext(),
-                    isWishlistedNow ? "Added to wishlist" : "Removed from wishlist",
-                    Toast.LENGTH_SHORT
-            ).show();
+        GestureDetector gestureDetector = new GestureDetector(
+                holder.productImageView.getContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDown(@NonNull MotionEvent event) {
+                        return true;
+                    }
 
-            if (wishlistChangedListener != null) {
-                int currentPosition = holder.getBindingAdapterPosition();
-                if (currentPosition != RecyclerView.NO_POSITION) {
-                    wishlistChangedListener.onWishlistChanged(product, isWishlistedNow, currentPosition);
-                }
+                    @Override
+                    public boolean onSingleTapConfirmed(@NonNull MotionEvent event) {
+                        if (productClickListener != null) productClickListener.onProductClick(product);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onDoubleTap(@NonNull MotionEvent event) {
+                        toggleWishlistWithAnimation(holder, product);
+                        return true;
+                    }
+                });
+        holder.productImageView.setOnTouchListener((view, event) ->
+                gestureDetector.onTouchEvent(event));
+    }
+
+    private void toggleWishlistWithAnimation(ProductViewHolder holder, Product product) {
+        boolean isWishlistedNow = WishlistManager.toggleWishlist(product);
+        updateWishlistIcon(holder.wishlistButton, isWishlistedNow);
+
+        // Reset first: RecyclerView reuses views when scrolling.
+        holder.wishlistButton.animate().cancel();
+        holder.wishlistButton.setScaleX(1f);
+        holder.wishlistButton.setScaleY(1f);
+        holder.wishlistButton.animate()
+                .scaleX(1.28f).scaleY(1.28f)
+                .setDuration(130)
+                .withEndAction(() -> holder.wishlistButton.animate()
+                        .scaleX(1f).scaleY(1f).setDuration(130).start())
+                .start();
+
+        Toast.makeText(holder.itemView.getContext(),
+                isWishlistedNow ? "Added to wishlist" : "Removed from wishlist",
+                Toast.LENGTH_SHORT).show();
+
+        if (wishlistChangedListener != null) {
+            int position = holder.getBindingAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                wishlistChangedListener.onWishlistChanged(product, isWishlistedNow, position);
             }
-        });
+        }
     }
 
     private void updateWishlistIcon(ImageButton button, boolean isWishlisted) {
