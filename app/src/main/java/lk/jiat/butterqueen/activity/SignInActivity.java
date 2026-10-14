@@ -55,9 +55,7 @@ public class SignInActivity extends AppCompatActivity {
         super.onStart();
 
         if (firebaseAuth.getCurrentUser() != null) {
-            Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            AccountHomeRouter.openHome(this);
         }
     }
 
@@ -99,9 +97,7 @@ public class SignInActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Toast.makeText(SignInActivity.this, "Sign in successful", Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        AccountHomeRouter.openHome(this);
                     } else {
                         String errorMessage = task.getException() != null
                                 ? task.getException().getMessage()
